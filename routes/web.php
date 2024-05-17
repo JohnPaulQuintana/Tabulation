@@ -18,7 +18,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PageController::class, 'index']);
 
-Route::get('/dashboard', [Administrator::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/dashboard', [Administrator::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::group(['middleware' => ['auth','verified']], function () {
+    Route::group(['prefix' => 'admin','as' => 'admin.'], function () {
+        Route::get('/dashboard', [Administrator::class, 'index'])->name('dashboard');
+        Route::get('/event', [Administrator::class, 'event'])->name('event');
+        Route::get('/create', [Administrator::class, 'create'])->name('create');
+    });
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

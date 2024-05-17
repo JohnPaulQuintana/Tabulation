@@ -7,13 +7,13 @@
 
     <div class="py-5">
         <div class="max-w-12xl mx-auto sm:px-6 lg:px-8 flex items-end justify-end mb-2">
-            @include('partials.breadcrum', ['section' => 'Create Events'])
+            @include('partials.breadcrum', ['section' => 'Judge'])
         </div>
 
         <div class="max-w-12xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <span class="text-sm md:text-xl lg:text-xl">Welcome to create event section,
+                    <span class="text-sm md:text-xl lg:text-xl">Welcome to judge section,
                         {{ auth()->user()->name }}
                     </span>
                 </div>
@@ -78,31 +78,28 @@
 
                                 </div>
 
-                                <div class="rounded-md shadow-1 p-2">
+                                <div class="rounded-md shadow p-2">
                                     <div class="space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900">
                                         
-                                        <div class="flex justify-between items-center px-2">
+                                        <div class="flex justify-between items-center">
                                             <span class="text-xl">Categories</span>
                                             <button type="button" id="addBtn" class="text-4xl text-blue-500 hover:text-blue-700">+</button>
                                         </div>
                                         
-                                        <div class="shadow p-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
-                                            <div class="col-span-2 mb-2">
-                                                <input type="text" name="categories[]" class="rounded-md w-full"/> 
-                                            </div>
-                                            <div class="col-span-2 flex gap-2 justify-between items-center">
-                                                <span>Sub Categories</span>
-                                                <div>
-                                                    <a href="#" id="subBtnAdd" class="bg-blue-500 text-white rounded-sm p-1 hover:bg-blue-700">+add</a>
-                                                    <a href="#" id="subBtnRemove" class="bg-red-500 text-white rounded-sm p-1 hover:bg-red-700">remove</a>
-                                                </div>
-                                            </div>
-                                            <div class="p-1 col-span-2 sub_categories_container">
-                                                
-                                            </div>
+                                        <div class="shadow p-1 flex gap-1">
+                                            <input type="text" name="category" class="rounded-md flex-1" />
+                                            <button type="button" id="addBtn" class="bg-blue-500 rounded-md text-sm text-white hover:bg-blue-700">Percentage</button>
                                         </div>
 
-                                        
+                                        <div class="p-1 flex gap-1">
+                                            <input type="text" name="category" class="rounded-md flex-1" />
+                                            <select type="select" name="" id="" class="rounded-md">
+                                                @for ($i=10;$i<=100;$i++)
+                                                    <option value="{{ $i }}">{{ $i }}%</option>
+                                                @endfor
+                                                
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
@@ -115,31 +112,4 @@
             </div>
         </div>
     </div>
-
-    @section("scripts")
-        <script>
-            $(document).ready(function(){
-                let subCategoryRender = ''
-                $('#subBtnAdd').click(function(){
-                    subCategoryRender = `
-                        <div class="flex gap-1 mb-2 sub-category-item">
-                            <input type="text" name="sub_categories[]" class="rounded-md flex-1" />
-                            <select type="select" name="sub_percentage[]" class="rounded-md">
-                                @for ($i=10;$i<=100;$i++)
-                                    <option value="{{ $i }}">{{ $i }}%</option>
-                                @endfor
-                            </select>
-                        </div>
-                    `
-
-                    $('.sub_categories_container').append(subCategoryRender)
-                })
-
-                $('#subBtnRemove').click(function(){
-                    // alert('dwadwad')
-                    $('.sub_categories_container .sub-category-item').last().remove();
-                })
-            })
-        </script>
-    @endsection
 </x-app-layout>

@@ -18,6 +18,7 @@
 
                 {{-- card --}}
                 <div class="max-w-12xl mx-auto sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-2 mb-2">
+                    {{-- {{ $events }} --}}
                     @for ($i=0;$i<4;$i++)
                         @include('partials.card', ['count' => $i+1])
                     @endfor
@@ -25,7 +26,7 @@
 
                 {{-- tables --}}
                 <div class="max-w-12xl mx-auto sm:px-6 lg:px-8 mb-2">
-                    @include('tables.event')
+                    @include('tables.event', ['events'=>$events])
                 </div>
             </div>
         </div>

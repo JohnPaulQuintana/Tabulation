@@ -38,89 +38,67 @@
             cursor: pointer;
         }
 
-        .hidden {
+        .hidden{
             display: none;
         }
-
-        .error {
+        .error{
             color: red;
         }
-
         /* Modal container */
         .loginModal {
-
-            position: fixed;
-            /* Stay in place */
-            z-index: 1;
-            /* Sit on top */
+           
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
             left: 0;
             top: 0;
-            width: 100%;
-            /* Full width */
-            height: 100%;
-            /* Full height */
-            overflow: auto;
-            /* Enable scroll if needed */
-            background-color: rgb(0, 0, 0);
-            /* Fallback color */
-            background-color: rgba(0, 0, 0, 0.4);
-            /* Black w/ opacity */
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
         }
-
         /* Modal content */
         .loginModal-content {
             background-color: #fefefe;
-            margin: 10% auto;
-            /* 15% from the top and centered */
+            margin: 10% auto; /* 15% from the top and centered */
             padding: 20px;
             border: 1px solid #888;
-            width: 80%;
-            /* Could be more or less, depending on screen size */
-            max-width: 600px;
-            /* Maximum width */
-            border-radius: 8px;
-            /* Rounded corners */
-            color: #061f1d;
-
+            width: 80%; /* Could be more or less, depending on screen size */
+            max-width: 600px; /* Maximum width */
+            border-radius: 8px; /* Rounded corners */
+           color: #061f1d;
+            
         }
-
-        .loginModal-content .controls {
+        .loginModal-content .controls{
             display: flex;
             justify-content: space-between;
         }
-
-        .loginModal-content .controls .close {
+        .loginModal-content .controls .close{
             cursor: pointer;
         }
-
-        .loginModal-content form {
+        .loginModal-content form{
             padding: 10px;
             background-color: #1a2e35;
             border-radius: 5px;
         }
-
-        .loginModal-content form .input-group {
+        .loginModal-content form .input-group{
             display: flex;
             flex-direction: column;
             margin-bottom: 20px;
             /* color: #1cbbb4; */
         }
-
-        .loginModal-content form .input-group label {
+        .loginModal-content form .input-group label{
             color: white;
         }
-
-        .loginModal-content form .input-group input,
-        .loginModal-content form .input-group button {
+        .loginModal-content form .input-group input, .loginModal-content form .input-group button{
             padding: 10px;
             border-radius: 8px;
             border-color: none;
-            border: 0;
+            border:0; 
         }
-
-        .loginModal-content form .input-group button {
+        .loginModal-content form .input-group button{
             background: #1cbbb4;
-            border: 0;
+            border:0; 
             color: white;
         }
     </style>
@@ -214,17 +192,11 @@
             </div>
             <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
                 <ol class="carousel-indicators">
-                    <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active">00</li>
-                    @foreach ($events as $key => $item)
-                        <li data-target="#carouselExampleIndicators" data-slide-to="{{ $key+1 }}">
-                            {{ $key + 1 }}</li>
-                    @endforeach
-                    {{-- <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active">01</li>
+                    <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active">01</li>
                     <li data-target="#carouselExampleIndicators" data-slide-to="1">02</li>
-                    <li data-target="#carouselExampleIndicators" data-slide-to="2">03</li> --}}
+                    <li data-target="#carouselExampleIndicators" data-slide-to="2">03</li>
                 </ol>
                 <div class="carousel-inner">
-
                     <div class="carousel-item active">
                         <div class="container-fluid">
                             <div class="row">
@@ -255,44 +227,67 @@
                             </div>
                         </div>
                     </div>
-
-                    @foreach ($events as $key => $item)
-                    {{-- {{ $item }} --}}
-                        <div class="carousel-item">
-                            <div class="container-fluid">
-                                <div class="row">
-                                    <div class="col-md-5 offset-md-1">
-                                        <div class="detail-box">
-                                            <h1>
-                                                {{ $item->name }}
-                                            </h1>
-                                            <p>
-                                                {{ $item->details }}
-                                            </p>
-                                            <p style="font-size: 22px; font-weight:700;">
-                                                {{ $item->created_at->format('F j, Y') }}
-                                            </p>
-                                            <div class="btn-box">
-                                                <a href="" class="btn-1">
-                                                    Details
-                                                </a>
-                                                <a href="" class="btn-2">
-                                                    Candidates
-                                                </a>
-                                            </div>
+                    <div class="carousel-item ">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-5 offset-md-1">
+                                    <div class="detail-box">
+                                        <h1>
+                                            AMA Campus model 2024
+                                        </h1>
+                                        <p>
+                                            It is a long established fact that a reader will be distracted by
+                                            the readable content of a page
+                                        </p>
+                                        <div class="btn-box">
+                                            <a href="" class="btn-1">
+                                                Details
+                                            </a>
+                                            <a href="" class="btn-2">
+                                                Candidates
+                                            </a>
                                         </div>
                                     </div>
-                                    <div class="offset-md-1 col-md-4 img-container">
-                                        <div class="img-box">
-                                            <img src="{{ asset('storage').'/'.$item->image }}" alt="">
-                                        </div>
+                                </div>
+                                <div class="offset-md-1 col-md-4 img-container">
+                                    <div class="img-box">
+                                        <img src="images/slider-img.png" alt="">
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    @endforeach
+                    </div>
+                    <div class="carousel-item ">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-5 offset-md-1">
+                                    <div class="detail-box">
+                                        <h1>
+                                            AMA Campus model 2024
+                                        </h1>
+                                        <p>
+                                            It is a long established fact that a reader will be distracted by
+                                            the readable content of a page
+                                        </p>
+                                        <div class="btn-box">
+                                            <a href="" class="btn-1">
+                                                Details
+                                            </a>
+                                            <a href="" class="btn-2">
+                                                Candidates
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="offset-md-1 col-md-4 img-container">
+                                    <div class="img-box">
+                                        <img src="images/slider-img.png" alt="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
 
             </div>
 
@@ -318,18 +313,6 @@
                 </h2>
             </div>
             <div class="category_container">
-                @foreach ($events as $item)
-                    <div class="box">
-                        <div class="img-box">
-                            <img src="images/c1.png" alt="">
-                        </div>
-                        <div class="detail-box">
-                            <h5>
-                                {{ $item->type }}
-                            </h5>
-                        </div>
-                    </div>
-                @endforeach
                 <div class="box">
                     <div class="img-box">
                         <img src="images/c1.png" alt="">

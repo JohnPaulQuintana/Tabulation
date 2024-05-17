@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [PageController::class, 'index']);
+Route::get('/', [PageController::class, 'index'])->name('index');
 
 // Route::get('/dashboard', [Administrator::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -25,6 +25,7 @@ Route::group(['middleware' => ['auth','verified']], function () {
         Route::get('/dashboard', [Administrator::class, 'index'])->name('dashboard');
         Route::get('/event', [Administrator::class, 'event'])->name('event');
         Route::get('/create', [Administrator::class, 'create'])->name('create');
+        Route::post('/store', [Administrator::class, 'store'])->name('store');
     });
 });
 

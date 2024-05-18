@@ -21,10 +21,10 @@
                 <div class="max-w-12xl mx-auto sm:px-6 lg:px-8 mb-2">
 
 
-                    <div class="relative overflow-x-auto                               sm:rounded-lg p-2">
+                    <div class="relative overflow-x-auto sm:rounded-lg p-2 bg-slate-100">
                         <div
-                            class="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900">
-                            <span>Recent Event's</span>
+                            class="p-2 flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900">
+                            <span>Created Event's</span>
                             <div class="flex items-center gap-2">
                                 <div>
                                     <a href="{{ route('admin.create') }}"
@@ -110,6 +110,9 @@
                                     <th scope="col" class="px-6 py-3">
                                         Date
                                     </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Action
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -160,6 +163,9 @@
                                         </td>
                                         <td class="px-6 py-4">
                                             <span>{{ $ev->created_at->format('F j, Y') }}</span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <a href="#"><i class="fa-solid fa-pen-to-square text-xl text-blue-500 hover:text-blue-700"></i></a>
                                         </td>
                                     </tr>
                                 @endforeach

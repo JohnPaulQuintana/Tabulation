@@ -140,11 +140,10 @@
                                                                 <i class="fa-solid fa-circle-dot text-green-500"></i>
                                                                 <input type="text"
                                                                     class="rounded-md border-0 flex-1"
-                                                                    value="{{ $s->sub_category }}">
+                                                                    value="{{ $s->sub_category }}" readonly>
                                                                 <input type="number" min="10" max="100"
                                                                     class="rounded-md border-0 w-1/3"
-                                                                    placeholder="10 - 100%"
-                                                                    value="{{ $s->percentage }}%">
+                                                                    value="{{ $s->percentage }}" readonly>
                                                             </div>
                                                         @endforeach
 

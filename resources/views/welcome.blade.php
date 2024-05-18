@@ -397,6 +397,10 @@
 
     <!-- end category section -->
 
+    @if (isset($online))
+     @include('popup.judge',['event'=>$online])
+    @endif
+   
     @include('popup.login')
     <!-- footer section -->
     <footer class="container-fluid footer_section">

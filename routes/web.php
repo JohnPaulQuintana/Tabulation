@@ -26,6 +26,8 @@ Route::group(['middleware' => ['auth','verified']], function () {
         Route::get('/event', [Administrator::class, 'event'])->name('event');
         Route::get('/create', [Administrator::class, 'create'])->name('create');
         Route::post('/store', [Administrator::class, 'store'])->name('store');
+        Route::get('/category/{id}', [Administrator::class, 'category'])->name('category');
+        Route::post('/category/store', [Administrator::class, 'categoryStore'])->name('category.store');
     });
 });
 

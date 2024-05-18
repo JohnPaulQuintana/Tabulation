@@ -83,23 +83,27 @@
                                         
                                         <div class="flex justify-between items-center px-2">
                                             <span class="text-xl">Categories</span>
-                                            <button type="button" id="addBtn" class="text-4xl text-blue-500 hover:text-blue-700">+</button>
+                                            {{-- <button type="button" id="addBtn" class="text-4xl text-blue-500 hover:text-blue-700">+</button> --}}
                                         </div>
                                         
-                                        <div class="shadow p-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
-                                            <div class="col-span-2 mb-2">
-                                                <input type="text" name="categories[]" class="rounded-md w-full"/> 
-                                            </div>
-                                            <div class="col-span-2 flex gap-2 justify-between items-center">
-                                                <span>Sub Categories</span>
-                                                <div>
-                                                    <a href="#" id="subBtnAdd" class="bg-blue-500 text-white rounded-sm p-1 hover:bg-blue-700">+add</a>
-                                                    <a href="#" id="subBtnRemove" class="bg-red-500 text-white rounded-sm p-1 hover:bg-red-700">remove</a>
+                                        <div id="main-container" class="max-h-[400px] overflow-auto">
+
+                                            <div class="shadow p-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
+                                                <div class="col-span-2 mb-2">
+                                                    <input type="text" name="categories[]" class="rounded-md w-full"/> 
+                                                </div>
+                                                <div class="col-span-2 flex gap-2 justify-between items-center">
+                                                    <span>Sub Categories</span>
+                                                    <div>
+                                                        <a href="#" class="subBtnAdd bg-blue-500 text-white rounded-sm p-1 hover:bg-blue-700">+add</a>
+                                                        <a href="#" class="subBtnRemove bg-red-500 text-white rounded-sm p-1 hover:bg-red-700">remove</a>
+                                                    </div>
+                                                </div>
+                                                <div class="p-1 col-span-2 sub_categories_container">
+                                                    
                                                 </div>
                                             </div>
-                                            <div class="p-1 col-span-2 sub_categories_container">
-                                                
-                                            </div>
+
                                         </div>
 
                                         
@@ -120,7 +124,9 @@
         <script>
             $(document).ready(function(){
                 let subCategoryRender = ''
-                $('#subBtnAdd').click(function(){
+
+                
+                $('.subBtnAdd').click(function(){
                     subCategoryRender = `
                         <div class="flex gap-1 mb-2 sub-category-item">
                             <input type="text" name="sub_categories[]" class="rounded-md flex-1" />
@@ -135,7 +141,7 @@
                     $('.sub_categories_container').append(subCategoryRender)
                 })
 
-                $('#subBtnRemove').click(function(){
+                $('.subBtnRemove').click(function(){
                     // alert('dwadwad')
                     $('.sub_categories_container .sub-category-item').last().remove();
                 })

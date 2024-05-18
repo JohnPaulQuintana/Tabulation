@@ -24,10 +24,7 @@
                     @endfor
                 </div>
 
-                {{-- tables --}}
-                <div class="max-w-12xl mx-auto sm:px-6 lg:px-8 mb-2">
-                    @include('tables.event', ['events'=>$events])
-                </div>
+                
             </div>
         </div>
     </div>

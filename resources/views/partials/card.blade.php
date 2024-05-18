@@ -1,5 +1,5 @@
 <div class="shadow flex justify-center items-center gap-10 rounded-md p-2 py-5">
-    <div class="text-7xl text-teal-500">
+    <div class="text-5xl text-teal-500">
         <i class="fa-duotone fa-calendar-check"></i>
     </div>
     <div class="text-center text-md">

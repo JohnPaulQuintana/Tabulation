@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\Administrator;
+use App\Http\Controllers\JudgeController;
 use App\Http\Controllers\Page\PageController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +20,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [PageController::class, 'index'])->name('index');
 
 // Route::get('/dashboard', [Administrator::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+// judge controller
+Route::post('/authenticate',[JudgeController::class, 'authenticate'])->name('authenticate');
 
 Route::group(['middleware' => ['auth','verified']], function () {
     Route::group(['prefix' => 'admin','as' => 'admin.'], function () {
@@ -28,6 +31,8 @@ Route::group(['middleware' => ['auth','verified']], function () {
         Route::post('/store', [Administrator::class, 'store'])->name('store');
         Route::get('/category/{id}', [Administrator::class, 'category'])->name('category');
         Route::post('/category/store', [Administrator::class, 'categoryStore'])->name('category.store');
+        Route::get('/judge/{id}', [Administrator::class, 'judge'])->name('judge');
+        Route::post('/judge/store', [Administrator::class, 'judgeStore'])->name('judge.store');
     });
 });
 

@@ -105,6 +105,9 @@
                                         Candidates
                                     </th>
                                     <th scope="col" class="px-6 py-3">
+                                        Judges
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
                                         Status
                                     </th>
                                     <th scope="col" class="px-6 py-3">
@@ -150,6 +153,12 @@
                                             <a href="#" class="font-bold text-blue-500 hover:cursor-pointer hover:text-blue-700">0+</a>
                                         </td>
                                         <td class="px-6 py-4">
+                                            <i class="fa-regular fa-user-group-simple"></i>
+                                            <a href="{{ route('admin.judge', $ev->id) }}" class="font-bold text-blue-500 hover:cursor-pointer hover:text-blue-700">
+                                                {{ count($ev->judge) }}+
+                                            </a>
+                                        </td>
+                                        <td class="px-6 py-4">
                                             <div class="flex items-center">
                                                 @switch($ev->status)
                                                     @case(0)
@@ -188,7 +197,7 @@
         <script>
             $(document).ready(function(){
                 $('#modalCloseBtn').click(function(){
-                    alert('dwadwad')
+                    // alert('dwadwad')
                     $('#modalBackdrop').addClass('hidden')
                     $('#successModal').addClass('hidden')
                 })

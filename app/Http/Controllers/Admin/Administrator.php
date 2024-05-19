@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Event;
+use App\Models\Judge;
 use App\Models\SubCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 use Spatie\FlareClient\View;
 
 class Administrator extends Controller
@@ -20,7 +22,7 @@ class Administrator extends Controller
 
     public function event()
     {
-        $events = Event::with(['category', 'category.subCategory'])->orderByDesc('created_at')->get();
+        $events = Event::with(['category', 'category.subCategory','judge'])->orderByDesc('created_at')->get();
         // dd($events);
         return view('admin.event', compact('events'));
     }
@@ -119,5 +121,39 @@ class Administrator extends Controller
         }
 
         return Redirect::route('admin.category', $request->event_id)->with(['save_category'=>'success','event_id'=>$request->event_id, 'message'=>'Category is successfully added!']);
+    }
+
+    //judge
+    public function judge(Request $request){
+        $event_id = $request->id;
+        $event = Event::with(['category', 'judge'])->find($event_id);
+        // dd($event);
+        return view('admin.judge.judge', compact('event'));
+    }
+    //store
+    public function judgeStore(Request $request){
+        $validated = $request->validate([
+            'name' => 'required',
+            'address' => 'required',
+            'position' => 'required',
+        ]);
+        // dd($request);
+         // Generate a unique code
+         $code = $this->generateUniqueCode();
+        Judge::create([
+            'event_id' =>$request->event_id,
+            'name' =>$validated['name'],
+            'address' =>$validated['address'],
+            'position' =>$validated['position'],
+            'code' => $code,
+        ]);
+
+        return Redirect::route('admin.judge',$request->event_id)->with(['judge-save'=>'success']);
+    }
+
+    private function generateUniqueCode()
+    {
+        // Generate a random string of 10 alphanumeric characters
+        return strtoupper(Str::random(10));
     }
 }

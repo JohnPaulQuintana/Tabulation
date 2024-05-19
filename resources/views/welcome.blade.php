@@ -399,9 +399,11 @@
 
     @if (isset($online))
      @include('popup.judge',['event'=>$online])
+     @else
+     @include('popup.login')
     @endif
    
-    @include('popup.login')
+    
     <!-- footer section -->
     <footer class="container-fluid footer_section">
         <div class="container">

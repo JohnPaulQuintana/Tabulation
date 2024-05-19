@@ -105,7 +105,10 @@
 
         <div class="max-w-12xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <h1 class="px-6 p-2 text-sm md:text-xl lg:text-xl">Created Judge</h1>
+                <div class="flex justify-between items-center px-6 p-2">
+                    <h1 class="text-sm md:text-xl lg:text-xl">Created Judge</h1>
+                    <button id="openCode" data-event_id="{{ $event->id }}" type="button" class="bg-slate-700 text-white px-1 rounded-sm hover:bg-slate-800"><i class="fa-solid fa-print"></i> code</button>
+                </div>
                 <div>
                     <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -164,6 +167,8 @@
             </div>
         </div>
 
+        @include('admin.judge.template.code')
+
         @if (session('judge-save'))
             @include('admin.popup.judge')
         @endif
@@ -177,7 +182,97 @@
                     $('#judgeBackdrop').addClass('hidden')
                     $('#judgeModal').addClass('hidden')
                 })
+
+                $('#openCode').click(function(){
+                    let eventID = $(this).data('event_id')
+                    let data = {
+                        'event_id': eventID,
+                    }
+                    let codeRender = ''
+                    sendRequest('POST', '/admin/judge/code', data )
+                    .then(response => {
+                        console.log('Success:', response.codes.judge);
+                        response.codes.judge.forEach(c => {
+                            codeRender += `
+                            <div class="border-2 p-2 text-center text-slate-700 uppercase rounded-sm">
+                                <h1 class="tracking-wide text-xl">${c.name}</h1>
+                                <div class="flex flex-col">
+                                    <span class="font-bold">CODE</span>
+                                    <span class="font-bold text-green-700">${c.code}</span>
+                                </div>
+                            </div>
+                            `
+                        });
+                        $('#renderCode').html(codeRender)
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+
+                    $('#codeModal').removeClass('hidden')
+                    $('#codeBackdrop').removeClass('hidden')
+                })
+
+                $('#printCancelBtn').click(function(){
+                    $('#codeModal').addClass('hidden')
+                    $('#codeBackdrop').addClass('hidden')
+                })
+
+                
             })
+
+            //dynamic request
+            function sendRequest(method, url, data = {}) {
+                return new Promise(function(resolve, reject) {
+                    // Get the CSRF token from the meta tag
+                    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+                    // Add the CSRF token to the data object
+                    data._token = csrfToken;
+
+                    $.ajax({
+                        method: method,
+                        url: url,
+                        data: data,
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken // Include CSRF token in the request headers
+                        },
+                        success: function(response) {
+                            resolve(response);
+                        },
+                        error: function(xhr, status, error) {
+                            reject(error);
+                        }
+                    });
+                });
+            }
+
+            const PrintDiv = ()=> {
+                    var contents = document.getElementById("code-container").innerHTML;
+                    var frame1 = document.createElement('iframe');
+                    frame1.name = "frame1";
+                    frame1.style.position = "absolute";
+                    frame1.style.top = "-1000000px";
+                    document.body.appendChild(frame1);
+                    var frameDoc = (frame1.contentWindow) ? frame1.contentWindow : (frame1.contentDocument.document) ? frame1.contentDocument.document : frame1.contentDocument;
+                    frameDoc.document.open();
+                    frameDoc.document.write(`<html><head><title>DIV Contents</title>`);
+                        // Copy stylesheets from main document to iframe
+                        var styles = document.querySelectorAll('link[rel="stylesheet"]');
+                        styles.forEach(function(style) {
+                            frameDoc.document.write(style.outerHTML);
+                        });
+                    frameDoc.document.write('</head><body>');
+                    frameDoc.document.write(contents);
+                    frameDoc.document.write('</body></html>');
+                    frameDoc.document.close();
+                    setTimeout(function () {
+                        window.frames["frame1"].focus();
+                        window.frames["frame1"].print();
+                        document.body.removeChild(frame1);
+                    }, 500);
+                    return false;
+                }
         </script>
     @endsection
 </x-app-layout>

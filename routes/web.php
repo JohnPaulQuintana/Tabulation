@@ -33,6 +33,7 @@ Route::group(['middleware' => ['auth','verified']], function () {
         Route::post('/category/store', [Administrator::class, 'categoryStore'])->name('category.store');
         Route::get('/judge/{id}', [Administrator::class, 'judge'])->name('judge');
         Route::post('/judge/store', [Administrator::class, 'judgeStore'])->name('judge.store');
+        Route::post('/judge/code', [Administrator::class, 'judgeCode'])->name('judge.code');
     });
 });
 

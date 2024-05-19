@@ -151,6 +151,14 @@ class Administrator extends Controller
         return Redirect::route('admin.judge',$request->event_id)->with(['judge-save'=>'success']);
     }
 
+    //jugde code
+    public function judgeCode(Request $request){
+        // dd($request);
+        $code = Event::with('judge')->where('id',$request->event_id)->first();;
+        // dd($code);
+        return response()->json(['codes'=>$code]);
+    }
+
     private function generateUniqueCode()
     {
         // Generate a random string of 10 alphanumeric characters

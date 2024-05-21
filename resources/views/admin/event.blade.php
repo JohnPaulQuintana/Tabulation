@@ -136,7 +136,7 @@
                                                 src="{{ asset('storage').'/'.$ev->image }}" alt="Jese image">
                                             <div class="ps-3">
                                                 <div class="text-base font-semibold">{{ $ev->name }}</div>
-                                                <div class="font-normal text-gray-500">San Jose Balanga Bataan</div>
+                                                <div class="font-normal text-gray-500">Santiago City</div>
                                             </div>
                                         </th>
                                         <td class="px-6 py-4">

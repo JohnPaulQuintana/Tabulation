@@ -98,7 +98,7 @@
                                             class="w-full p-2 bg-red-500 hover:bg-red-700 text-white text-center">Cancel</a>
                                         <button type="submit"
                                             class="w-full p-2 bg-blue-500 hover:bg-blue-700 text-white">Save
-                                            Judge</button>
+                                            Candidate</button>
                                     </div>
                                 </div>
                             </form>
@@ -109,7 +109,7 @@
             </div>
         </div>
 
-        <div class="max-w-12xl mx-auto sm:px-6 lg:px-8">
+        {{-- <div class="max-w-12xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="flex justify-between items-center px-6 p-2">
                     <h1 class="text-sm md:text-xl lg:text-xl">Created Judge</h1>
@@ -123,13 +123,7 @@
                                     Name
                                 </th>
                                 <th scope="col" class="px-6 py-3">
-                                    Address
-                                </th>
-                                <th scope="col" class="px-6 py-3">
-                                    Position
-                                </th>
-                                <th scope="col" class="px-6 py-3">
-                                    Code
+                                    age
                                 </th>
                                 
                                 <th scope="col" class="px-6 py-3">
@@ -171,7 +165,7 @@
                     </table>
                 </div>
             </div>
-        </div>
+        </div> --}}
 
         @if (session('candidate-status'))
             @include('admin.popup.candidate')

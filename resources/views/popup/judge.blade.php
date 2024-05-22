@@ -15,9 +15,9 @@
         <!-- Session Status -->
         <x-auth-session-status class="mb-4" :status="session('status')" />
 
-        <form action="{{ route('authenticate') }}" method="post">
+        <form action="{{ route('login') }}" method="post">
             @csrf
-            
+            <input type="text" class="hidden" name="type" value="judge">
             <div class="input-group">
                 <label for="code">Authentication Code</label>
                 <input type="text" name="code" id="code" value="{{ old('code') }}">

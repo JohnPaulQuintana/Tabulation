@@ -7,7 +7,9 @@ use App\Models\Category;
 use App\Models\Event;
 use App\Models\Judge;
 use App\Models\SubCategory;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 use Spatie\FlareClient\View;
@@ -22,7 +24,7 @@ class Administrator extends Controller
 
     public function event()
     {
-        $events = Event::with(['category', 'category.subCategory','judge'])->orderByDesc('created_at')->get();
+        $events = Event::with(['category', 'category.subCategory','judge'])->where('type','!=','System Message')->orderByDesc('created_at')->get();
         // dd($events);
         return view('admin.event', compact('events'));
     }
@@ -140,7 +142,18 @@ class Administrator extends Controller
         // dd($request);
          // Generate a unique code
          $code = $this->generateUniqueCode();
+        //  create user account on table
+        $judge = User::create([
+            'name' => $validated['name'],
+            'email' => fake()->unique()->safeEmail(),
+            'email_verified_at' => now(),
+            'password' => Hash::make('password'),
+            'isAdmin' => false,
+            'code' => $code,
+
+        ]);
         Judge::create([
+            'user_id' =>$judge->id,
             'event_id' =>$request->event_id,
             'name' =>$validated['name'],
             'address' =>$validated['address'],

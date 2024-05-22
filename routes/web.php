@@ -21,10 +21,10 @@ Route::get('/', [PageController::class, 'index'])->name('index');
 
 // Route::get('/dashboard', [Administrator::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 // judge controller
-Route::post('/authenticate',[JudgeController::class, 'authenticate'])->name('authenticate');
+// Route::post('/authenticate',[JudgeController::class, 'authenticate'])->name('authenticate');
 
 Route::group(['middleware' => ['auth','verified']], function () {
-    Route::group(['prefix' => 'admin','as' => 'admin.'], function () {
+    Route::group(['prefix' => 'admin','middleware' => 'is_admin','as' => 'admin.'], function () {
         Route::get('/dashboard', [Administrator::class, 'index'])->name('dashboard');
         Route::get('/event', [Administrator::class, 'event'])->name('event');
         Route::get('/create', [Administrator::class, 'create'])->name('create');
@@ -34,6 +34,13 @@ Route::group(['middleware' => ['auth','verified']], function () {
         Route::get('/judge/{id}', [Administrator::class, 'judge'])->name('judge');
         Route::post('/judge/store', [Administrator::class, 'judgeStore'])->name('judge.store');
         Route::post('/judge/code', [Administrator::class, 'judgeCode'])->name('judge.code');
+    });
+
+    // judge
+    Route::group(['middleware' => ['auth']], function () {
+        Route::group(['prefix' => 'judge','as' => 'judge.'], function () {
+            Route::get('/dashboard',[JudgeController::class, 'index'])->name('dashboard');
+        });
     });
 });
 

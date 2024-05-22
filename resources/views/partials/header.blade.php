@@ -28,8 +28,9 @@
                 </span>
             </button>
             <!-- Hamburger Toggle BTN -->
-            <a class="block flex-shrink-0 lg:hidden" href="index.html">
-                <img class="w-7" src="{{ asset('images/logo.png') }}" alt="Logo" />
+            <a class="flex items-center flex-shrink-0 lg:hidden" href="index.html">
+                <img class="w-7" src="{{ asset('images/ama.png') }}" alt="Logo" />
+                <span>{{ config('app.name', 'Laravel') }}</span>
             </a>
         </div>
         <div class="hidden sm:block">

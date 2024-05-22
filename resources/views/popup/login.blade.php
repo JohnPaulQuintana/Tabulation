@@ -16,6 +16,7 @@
 
         <form action="{{ route('login') }}" method="post">
             @csrf
+            <input type="text" class="hidden" name="type" value="email">
             <div class="input-group">
                 <label for="email">Email</label>
                 <input type="text" name="email" id="email" value="{{ old('email') }}">

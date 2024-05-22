@@ -151,9 +151,9 @@
             <div class="container-fluid">
                 <nav class="navbar navbar-expand-lg custom_nav-container">
                     <a class="navbar-brand" href="index.html">
-                        <img src="{{ asset('images/logo.png') }}" alt="" />
+                        <img src="{{ asset('images/ama.png') }}" alt="" />
                         <span>
-                            Tabulation
+                            {{ config('app.name', 'Laravel') }}
                         </span>
                     </a>
                     <button class="navbar-toggler" type="button" data-toggle="collapse"

@@ -114,6 +114,9 @@
                                         Date
                                     </th>
                                     <th scope="col" class="px-6 py-3">
+                                        Time
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
                                         Action
                                     </th>
                                 </tr>
@@ -171,7 +174,10 @@
                                             </div>
                                         </td>
                                         <td class="px-6 py-4">
-                                            <span>{{ $ev->created_at->format('F j, Y') }}</span>
+                                            <span>{{ \Carbon\Carbon::parse($ev->date)->format('F d, Y') }}</span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span>{{ \Carbon\Carbon::parse($ev->time)->format('h:i A') }}</span>
                                         </td>
                                         <td class="px-6 py-4">
                                             <a href="#"><i class="fa-solid fa-pen-to-square text-xl text-blue-500 hover:text-blue-700"></i></a>

@@ -40,7 +40,10 @@ class Administrator extends Controller
 
         $validated = $request->validate([
             'event_name' => 'required',
+            'event_address' => 'required',
             'event_details' => 'required',
+            'event_time' => 'required',
+            'event_date' => 'required',
             'event_type' => 'required',
             'event_image' => 'required',
             'event_image' => 'required|image',  // Ensure it's an image
@@ -55,7 +58,10 @@ class Administrator extends Controller
 
             $event = Event::create([
                 'name' => $validated['event_name'],
+                'address' => $validated['event_address'],
                 'details' => $validated['event_details'],
+                'date' => $validated['event_date'],
+                'time' => $validated['event_time'],
                 'type' => $validated['event_type'],
                 'image' => $path,
             ]);

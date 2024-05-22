@@ -24,11 +24,13 @@
 
                     <div class="overflow-x-auto sm:rounded-lg">
                         <div>
+
                             <div
                                 class="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900 text-xl">
                                 <span>Create Event's</span>
 
                             </div>
+
                             <form action="{{ route('admin.store') }}" method="post" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
                                 @csrf
                                 <div class="shadow py-2">
@@ -46,13 +48,23 @@
                                                 <span class="text-red-500">Uploading Image is required.</span>
                                             @enderror
                                         </div>
-                                        <div class="shadow col-span-3 px-1">
-                                            <label for="event_name">Event Name</label>
-                                            <input type="text" name="event_name" class="block p-2 w-full rounded-md"
-                                                value="{{ old('event_name') }}">
-                                            @error('event_name')
-                                                <span class="text-red-500">Name of event is required.</span>
-                                            @enderror
+                                        <div class="col-span-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2">
+                                            <div class="px-1">
+                                                <label for="event_name">Event Name</label>
+                                                <input type="text" name="event_name" class="block p-2 w-full rounded-md"
+                                                    value="{{ old('event_name') }}">
+                                                @error('event_name')
+                                                    <span class="text-red-500">Name of event is required.</span>
+                                                @enderror
+                                            </div>
+                                            <div class="px-1">
+                                                <label for="event_address">Event Address</label>
+                                                <input type="text" name="event_address" class="block p-2 w-full rounded-md"
+                                                    value="{{ old('event_address') }}">
+                                                @error('event_address')
+                                                    <span class="text-red-500">Address of event is required.</span>
+                                                @enderror
+                                            </div>
                                         </div>
                                         
                                         <div class="shadow col-span-3 px-1">
@@ -65,23 +77,42 @@
                                 </div>
 
                                 <div class="shadow py-2">
-                                    <div class="shadow px-1">
+                                    <div class="px-1">
                                         <label for="event_name">Event Details</label>
                                         <textarea name="event_details" id="" cols="5" rows="3" class="w-full">{{ old('event_details') }}</textarea>
                                         @error('event_details')
                                             <span class="text-red-500">Details of event is required.</span>
                                         @enderror
                                     </div>
-                                    <div class="shadow px-1">
-                                        <label for="event_type">Event Type</label>
-                                        <input type="text" name="event_type" class="block p-2 w-full rounded-md"
-                                            value="{{ old('event_type') }}">
-                                        @error('event_type')
-                                            <span class="text-red-500">Type of event is required.</span>
-                                        @enderror
+                                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-2">
+                                        <div class="px-1">
+                                            <label for="event_date">Event Date</label>
+                                            <input type="date" name="event_date" class="block p-2 w-full rounded-md"
+                                                value="{{ old('event_date') }}">
+                                            @error('event_date')
+                                                <span class="text-red-500">Date of event is required.</span>
+                                            @enderror
+                                        </div>
+                                        <div class="px-1">
+                                            <label for="event_time">Event Time</label>
+                                            <input type="time" name="event_time" class="block p-2 w-full rounded-md"
+                                                value="{{ old('event_time') }}">
+                                            @error('event_time')
+                                                <span class="text-red-500">Time of event is required.</span>
+                                            @enderror
+                                        </div>
+                                        <div class="px-1">
+                                            <label for="event_type">Event Type</label>
+                                            <input type="text" name="event_type" class="block p-2 w-full rounded-md"
+                                                value="{{ old('event_type') }}">
+                                            @error('event_type')
+                                                <span class="text-red-500">Type of event is required.</span>
+                                            @enderror
+                                        </div>
                                     </div>
                                 </div>
                             </form>
+
                         </div>
 
                         

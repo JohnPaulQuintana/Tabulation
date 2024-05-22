@@ -12,7 +12,7 @@ class Event extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name','details','type','image','status'];
+    protected $fillable = ['name','details','address','date','time','type','image','status'];
 
     public function category() :HasMany{
         return $this->hasMany(Category::class);

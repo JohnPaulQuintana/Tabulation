@@ -257,7 +257,6 @@
                     </div>
 
                     @foreach ($events as $key => $item)
-                    {{-- {{ $item }} --}}
                         <div class="carousel-item">
                             <div class="container-fluid">
                                 <div class="row">
@@ -270,7 +269,11 @@
                                                 {{ $item->details }}
                                             </p>
                                             <p style="font-size: 22px; font-weight:700;">
-                                                {{ $item->created_at->format('F j, Y') }}
+                                                @if ($item->type !== 'System Message')
+                                                    {{ \Carbon\Carbon::parse($item->date)->format('F d, Y') }}
+                                                @endif
+                                                
+                                                {{-- {{ $item->created_at->format('F j, Y') }} --}}
                                             </p>
                                             <div class="btn-box">
                                                 <a href="" class="btn-1">

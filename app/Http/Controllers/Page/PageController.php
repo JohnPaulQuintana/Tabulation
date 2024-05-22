@@ -10,6 +10,7 @@ class PageController extends Controller
 {
     public function index(){
         $events = Event::orderByDesc('created_at')->get();
+        // dd($events);
         $online = Event::where('status', 1)->first();
         return view('welcome', compact('events','online'));
     }

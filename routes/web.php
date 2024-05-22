@@ -34,12 +34,15 @@ Route::group(['middleware' => ['auth','verified']], function () {
         Route::get('/judge/{id}', [Administrator::class, 'judge'])->name('judge');
         Route::post('/judge/store', [Administrator::class, 'judgeStore'])->name('judge.store');
         Route::post('/judge/code', [Administrator::class, 'judgeCode'])->name('judge.code');
+        Route::get('/candidate/{id}', [Administrator::class, 'candidate'])->name('candidate');
+        Route::post('/candidate/store', [Administrator::class, 'candidateStore'])->name('candidate.store');
     });
 
     // judge
     Route::group(['middleware' => ['auth']], function () {
         Route::group(['prefix' => 'judge','as' => 'judge.'], function () {
             Route::get('/dashboard',[JudgeController::class, 'index'])->name('dashboard');
+            Route::get('/candidates',[JudgeController::class, 'candidates'])->name('candidates');
         });
     });
 });

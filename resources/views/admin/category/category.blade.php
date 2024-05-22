@@ -62,7 +62,7 @@
 
                                         <div class="flex flex-col ">
                                             <div class="flex justify-between items-center">
-                                                <label for="">SubCategory</label>
+                                                <label for="">Criteria</label>
 
                                             </div>
                                             <div class="flex flex-col gap-2">
@@ -128,7 +128,7 @@
 
                                                 <div class="flex flex-col ">
                                                     <div class="flex justify-between items-center">
-                                                        <label for="">SubCategory</label>
+                                                        <label for="">Criteria</label>
                                                         <div class="text-green-500">
                                                             (percentage)
                                                         </div>

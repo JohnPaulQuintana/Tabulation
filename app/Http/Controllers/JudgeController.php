@@ -14,4 +14,12 @@ class JudgeController extends Controller
         $judgeWithEvent = Judge::with('event')->where('user_id',$id)->first();
         return view('judge.index', compact('judgeWithEvent'));
     }
+
+    // display candidates
+    public function candidates(){
+        // active events
+        $activeEvent = Event::with(['category', 'candidates'])->where('status', true)->first();
+        // dd($activeEvent);
+        return view('judge.candidate', compact('activeEvent'));
+    }
 }

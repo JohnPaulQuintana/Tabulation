@@ -153,7 +153,9 @@
                                         </td>
                                         <td class="px-6 py-4">
                                             <i class="fa-regular fa-user-group-simple"></i>
-                                            <a href="#" class="font-bold text-blue-500 hover:cursor-pointer hover:text-blue-700">0+</a>
+                                            <a href="{{ route('admin.candidate', $ev->id) }}" class="font-bold text-blue-500 hover:cursor-pointer hover:text-blue-700">
+                                                {{ count($ev->candidates) }}+
+                                            </a>
                                         </td>
                                         <td class="px-6 py-4">
                                             <i class="fa-regular fa-user-group-simple"></i>

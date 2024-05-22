@@ -46,7 +46,7 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function code() :HasOne{
+    public function judge() :HasOne{
         return $this->hasOne(Judge::class);
     }
 }

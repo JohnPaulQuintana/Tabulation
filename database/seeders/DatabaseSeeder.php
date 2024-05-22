@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
             'name'=>'Welcome to AMA Tabulation System',
             'details'=>"Our app is designed to streamline your tabulation process, offering you accurate and efficient results. Whether you're managing data, calculating scores, or organizing information, we've got you covered.",
             'type'=>'System Message',
-            'image'=>"public/images/welcome.png",
+            'image'=>"images/welcome.png",
             'status'=>false
         ]);
         \App\Models\User::factory()->create([

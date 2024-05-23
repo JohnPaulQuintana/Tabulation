@@ -72,7 +72,30 @@ class LoginRequest extends FormRequest
                         'code' => trans('auth.failed'),
                     ]);
                 }
-    
+
+                // Check if the user is an admin
+                if ($user->isAdmin) {
+                    Auth::login($user);
+                    break;
+                }
+
+                // Assuming the User model has a relationship method `judge` and Judge model has a relationship method `event`
+                $judge = $user->judge;
+                // dd($judge);
+                if (!$judge) {
+                    throw ValidationException::withMessages([
+                        'code' => 'This user is not associated with any judge.',
+                    ]);
+                }
+
+                $event = $judge->event;
+
+                if (!$event || $event->status != 1) {
+                    throw ValidationException::withMessages([
+                        'code' => 'You are not able to authenticate on this event.',
+                    ]);
+                }
+
                 Auth::login($user);
                 break;
             

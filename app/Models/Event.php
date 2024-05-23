@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Candidate;
 use App\Models\Category;
 use App\Models\Judge;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,5 +21,9 @@ class Event extends Model
 
     public function judge() :HasMany{
         return $this->hasMany(Judge::class);
+    }
+
+    public function candidates() :HasMany{
+        return $this->hasMany(Candidate::class);
     }
 }

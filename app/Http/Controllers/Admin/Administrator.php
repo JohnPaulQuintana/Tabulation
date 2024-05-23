@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Candidate;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\Judge;
@@ -24,7 +25,7 @@ class Administrator extends Controller
 
     public function event()
     {
-        $events = Event::with(['category', 'category.subCategory','judge'])->where('type','!=','System Message')->orderByDesc('created_at')->get();
+        $events = Event::with(['category', 'category.subCategory','judge', 'candidates'])->where('type','!=','System Message')->orderByDesc('created_at')->get();
         // dd($events);
         return view('admin.event', compact('events'));
     }
@@ -66,22 +67,7 @@ class Administrator extends Controller
                 'image' => $path,
             ]);
 
-            //  if($event){
-            //     $category = Category::create([
-            //         'event_id'=>$event->id,
-            //         'category_name'=>$request->categories[0],
-            //     ]);
-
-            //     if($category){
-            //         foreach ($request->sub_categories as $key => $value) {
-            //            SubCategory::create([
-            //                 'category_id'=>$category->id,
-            //                 'sub_category'=>$value,
-            //                 'percentage'=>$request->sub_percentage[$key],
-            //            ]);
-            //         }
-            //     }
-            //  }
+            
             return Redirect::route('admin.event')->with('status', 'success');
         }
     }
@@ -94,7 +80,7 @@ class Administrator extends Controller
         // dd($categories);
         return view('admin.category.category', compact('event_id', 'categories'));
     }
-    // store
+    // store category
     public function categoryStore(Request $request)
     {
         // dd($request);
@@ -138,7 +124,7 @@ class Administrator extends Controller
         // dd($event);
         return view('admin.judge.judge', compact('event'));
     }
-    //store
+    //store Jusge
     public function judgeStore(Request $request){
         $validated = $request->validate([
             'name' => 'required',
@@ -176,6 +162,39 @@ class Administrator extends Controller
         $code = Event::with('judge')->where('id',$request->event_id)->first();;
         // dd($code);
         return response()->json(['codes'=>$code]);
+    }
+
+    //candidate
+    public function candidate(Request $request){
+        $event_id = $request->id;
+        $event = Event::with(['category', 'judge'])->find($event_id);
+        // dd($event);
+        return view('admin.candidate.candidate', compact('event'));
+    }
+
+    //store candidate
+    public function candidateStore(Request $request){
+        // dd($request);
+        $validated = $request->validate([
+            'name' => 'required',
+            'age' => 'required',
+            'profile' => 'required|image',  // Ensure it's an image,
+        ]);
+        
+        if ($request->hasFile('profile')) {
+            // Store the uploaded file and update the user's profile picture
+            $path = $request->file('profile')->store('profile', 'public');
+
+            Candidate::create([
+                'event_id'=>$request->event_id,
+                'name'=>$validated['name'],
+                'age'=>$validated['age'],
+                'profile'=>$path,
+            ]);
+
+            
+            return Redirect::route('admin.candidate',$request->event_id)->with('candidate-status', 'success');
+        }
     }
 
     private function generateUniqueCode()

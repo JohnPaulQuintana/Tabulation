@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 use Spatie\FlareClient\View;
-
+use Illuminate\Support\Facades\Storage;
 class Administrator extends Controller
 {
     public function index()
@@ -78,25 +78,44 @@ class Administrator extends Controller
     //update events
     public function updateEvent(Request $request){
         // dd($request);
+        // Validate the request...
         $validated = $request->validate([
-            'event_name' => 'required',
-            'event_address' => 'required',
-            'event_details' => 'required',
+            'event_id' => 'required|integer|exists:events,id',
+            'event_name' => 'required|string|max:255',
+            'event_details' => 'required|string',
+            'event_type' => 'required|string|max:50',
+            'event_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'event_time' => 'required',
             'event_date' => 'required',
-            'event_type' => 'required',
         ]);
 
-        $edit = Event::find($request->event_id);
+        
+         // Find the event
+        $event = Event::findOrFail($request->event_id);
+        // Check if a new image file is uploaded
         if ($request->hasFile('event_image')) {
-            // Store the uploaded file and update the user's profile picture
+            // Store the uploaded file and get the path
             $path = $request->file('event_image')->store('images', 'public');
+
+            // Delete the old image file if it exists
+            if ($event->image && Storage::disk('public')->exists($event->image)) {
+                Storage::disk('public')->delete($event->image);
+            }
+
+            // Set the new image path
+            $event->image = $path;
         }
 
-        Event::where('id',$request->event_id)->update([
-            
-        ]);
-        
+        // Update the event with other fields
+        $event->name = $validated['event_name'];
+        $event->details = $validated['event_details'];
+        $event->type = $validated['event_type'];
+        $event->date = $validated['event_date'];
+        $event->time = $validated['event_time'];
+
+        // Save the updated event
+        $event->save();
+        return Redirect::route('admin.event')->with('status', 'success');
     }
 
     // category

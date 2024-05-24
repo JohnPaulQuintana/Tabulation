@@ -46,7 +46,6 @@ class Administrator extends Controller
             'event_time' => 'required',
             'event_date' => 'required',
             'event_type' => 'required',
-            'event_image' => 'required',
             'event_image' => 'required|image',  // Ensure it's an image
             // 'categories' => 'required|array|min:1',
             // 'sub_categories' => 'required|array',
@@ -70,6 +69,34 @@ class Administrator extends Controller
             
             return Redirect::route('admin.event')->with('status', 'success');
         }
+    }
+    //edit events
+    public function editEvent(Request $request){
+        $edit = Event::find($request->id);
+        return view('admin.event.edit',compact('edit'));
+    }
+    //update events
+    public function updateEvent(Request $request){
+        // dd($request);
+        $validated = $request->validate([
+            'event_name' => 'required',
+            'event_address' => 'required',
+            'event_details' => 'required',
+            'event_time' => 'required',
+            'event_date' => 'required',
+            'event_type' => 'required',
+        ]);
+
+        $edit = Event::find($request->event_id);
+        if ($request->hasFile('event_image')) {
+            // Store the uploaded file and update the user's profile picture
+            $path = $request->file('event_image')->store('images', 'public');
+        }
+
+        Event::where('id',$request->event_id)->update([
+            
+        ]);
+        
     }
 
     // category

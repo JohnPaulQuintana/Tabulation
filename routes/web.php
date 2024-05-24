@@ -27,6 +27,8 @@ Route::group(['middleware' => ['auth','verified']], function () {
     Route::group(['prefix' => 'admin','middleware' => 'is_admin','as' => 'admin.'], function () {
         Route::get('/dashboard', [Administrator::class, 'index'])->name('dashboard');
         Route::get('/event', [Administrator::class, 'event'])->name('event');
+        Route::get('/event/edit/{id}', [Administrator::class, 'editEvent'])->name('event.edit');
+        Route::post('/event/update', [Administrator::class, 'updateEvent'])->name('event.update');
         Route::get('/create', [Administrator::class, 'create'])->name('create');
         Route::post('/store', [Administrator::class, 'store'])->name('store');
         Route::get('/category/{id}', [Administrator::class, 'category'])->name('category');

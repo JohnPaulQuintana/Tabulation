@@ -236,14 +236,7 @@
                                         <p>
                                             Our app is designed to streamline your tabulation process, offering you accurate and efficient results. Whether you're managing data, calculating scores, or organizing information, we've got you covered.
                                         </p>
-                                        {{-- <div class="btn-box">
-                                            <a href="" class="btn-1">
-                                                Details
-                                            </a>
-                                            <a href="" class="btn-2">
-                                                Candidates
-                                            </a>
-                                        </div> --}}
+                                        
                                     </div>
                                 </div>
                                 <div class="offset-md-1 col-md-4 img-container">
@@ -256,7 +249,8 @@
                     </div>
 
                     @foreach ($events as $key => $item)
-                    @if ($item->type !== 'System Message')
+                        @if ($item->type !== 'System Message')
+
                         <div class="carousel-item">
                             <div class="container-fluid">
                                 <div class="row">
@@ -268,31 +262,62 @@
                                             <p>
                                                 {{ $item->details }}
                                             </p>
+
                                             <p style="font-size: 22px; font-weight:700;">
-                                              
-                                                    {{ \Carbon\Carbon::parse($item->date)->format('F d, Y') }}
-                                               
                                                 
-                                                {{-- {{ $item->created_at->format('F j, Y') }} --}}
-                                            </p>
-                                            <div class="btn-box">
-                                                <a href="" class="btn-1">
-                                                    Details
-                                                </a>
-                                                <a href="" class="btn-2">
-                                                    Candidates
-                                                </a>
-                                            </div>
+                                                {{ \Carbon\Carbon::parse($item->date)->format('F d, Y') }}
+                                        
+                                            
+                                            {{-- {{ $item->created_at->format('F j, Y') }} --}}
+                                        </p>
+                                            
                                         </div>
-                                        <div class="offset-md-1 col-md-4 img-container">
-                                            <div class="img-box">
-                                                <img src="{{ asset('storage').'/'.$item->image }}" alt="">
-                                            </div>
+                                    </div>
+                                    <div class="offset-md-1 col-md-4 img-container">
+                                        <div class="img-box">
+                                            <img src="images/ama.png" alt="">
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        
+                            {{-- <div class="carousel-item">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col-md-5 offset-md-1">
+                                            <div class="detail-box">
+                                                <h1>
+                                                    {{ $item->name }}
+                                                </h1>
+                                                <p>
+                                                    {{ $item->details }}
+                                                </p>
+                                                <p style="font-size: 22px; font-weight:700;">
+                                                
+                                                        {{ \Carbon\Carbon::parse($item->date)->format('F d, Y') }}
+                                                
+                                            
+                                                </p>
+                                                <div class="btn-box">
+                                                    <a href="" class="btn-1">
+                                                        Details
+                                                    </a>
+                                                    <a href="" class="btn-2">
+                                                        Candidates
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class="offset-md-1 col-md-4 img-container">
+                                                <div class="img-box">
+                                                    <img src="{{ asset('storage').'/'.$item->image }}" alt="">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> --}}
                         @endif
                     @endforeach
                 </div>

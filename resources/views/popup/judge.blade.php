@@ -4,7 +4,8 @@
     <div class="loginModal-content">
         
         <div class="controls">
-            <div style="width:100%;">
+            <div style="width:100%;display:flex; flex-direction:column; align-items:center;">
+                <img style="width: 25%; height:100px;" src="{{ asset('storage').'/'.$online->image }}" alt="">
                 <h4 class="text-center fw-bolder text-uppercase text-info">{{ $online->name }}</h4>
                 <p class="text-center text-secondary">{{ $online->details }}</p>
                 <p class="text-center text-info">{{ $online->created_at->format('F j, Y') }}</p>

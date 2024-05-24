@@ -12,6 +12,7 @@ class JudgeController extends Controller
     public function index(){
         $id = auth()->user()->id;
         $judgeWithEvent = Judge::with('event')->where('user_id',$id)->first();
+        // dd($judgeWithEvent);
         return view('judge.index', compact('judgeWithEvent'));
     }
 

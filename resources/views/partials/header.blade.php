@@ -39,7 +39,7 @@
 
         <div class="flex items-center gap-3 2xsm:gap-7">
             
-
+            {{-- {{ Auth::user() }} --}}
             <!-- User Area -->
             <div class="relative" x-data="{ dropdownOpen: false }" @click.outside="dropdownOpen = false">
                 <a class="flex items-center gap-4" href="#" @click.prevent="dropdownOpen = ! dropdownOpen">
@@ -50,7 +50,7 @@
                       @if (empty(Auth::user()->profile))
                         <i class="fa-duotone fa-user text-3xl"></i>
                       @else
-                        <img class="w-7" src="{{ asset('storage').'/'.Auth::user()->profile }}" alt="Logo">
+                        <img class="w-7" src="{{ asset('storage').'/'.Auth::user()->judge->profile }}" alt="Logo">
                       @endif
                     </span>
 

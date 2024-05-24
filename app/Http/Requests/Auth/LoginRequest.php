@@ -95,7 +95,7 @@ class LoginRequest extends FormRequest
                         'code' => 'You are not able to authenticate on this event.',
                     ]);
                 }
-
+                // $user->load('judge'); // Eager load the judge relationship
                 Auth::login($user);
                 break;
             

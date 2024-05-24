@@ -63,29 +63,38 @@
                                         <h1 class="text-center font-bold p-1 uppercase bg-slate-700 text-white">Add a
                                             new judge</h1>
                                     </div>
-                                    <div class="shadow px-1 mb-2">
-                                        <label for="name">Judge Name</label>
-                                        <input type="text" name="name" class="p-2 w-full rounded-md" value="{{ old('name') }}">
-                                        <input type="text" name="event_id" class="p-2 w-full rounded-md hidden" value="{{ $event->id }}">
-                                        @error('name')
-                                            <span class="text-red-500">Name is required.</span>
-                                        @enderror
-                                    </div>
-                                    <div class="shadow px-1 mb-2">
-                                        <label for="address">Address</label>
-                                        <input type="text" name="address" class="block p-2 w-full rounded-md"
-                                            value="{{ old('address') }}">
-                                        @error('address')
-                                            <span class="text-red-500">Address is required.</span>
-                                        @enderror
-                                    </div>
-                                    <div class="shadow px-1 mb-2">
-                                        <label for="position">Position</label>
-                                        <input type="text" name="position" class="block p-2 w-full rounded-md"
-                                            value="{{ old('position') }}">
-                                        @error('position')
-                                            <span class="text-red-500">Position is required.</span>
-                                        @enderror
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div class="shadow px-1 mb-2">
+                                            <label for="profile">Judge Profile</label>
+                                            <input type="file" name="profile" class="p-2 w-full rounded-md" value="{{ old('profile') }}">
+                                            @error('profile')
+                                                <span class="text-red-500">Profile is required.</span>
+                                            @enderror
+                                        </div>
+                                        <div class="shadow px-1 mb-2">
+                                            <label for="name">Judge Name</label>
+                                            <input type="text" name="name" class="p-2 w-full rounded-md" value="{{ old('name') }}">
+                                            <input type="text" name="event_id" class="p-2 w-full rounded-md hidden" value="{{ $event->id }}">
+                                            @error('name')
+                                                <span class="text-red-500">Name is required.</span>
+                                            @enderror
+                                        </div>
+                                        <div class="shadow px-1 mb-2">
+                                            <label for="address">Address</label>
+                                            <input type="text" name="address" class="block p-2 w-full rounded-md"
+                                                value="{{ old('address') }}">
+                                            @error('address')
+                                                <span class="text-red-500">Address is required.</span>
+                                            @enderror
+                                        </div>
+                                        <div class="shadow px-1 mb-2">
+                                            <label for="position">Position</label>
+                                            <input type="text" name="position" class="block p-2 w-full rounded-md"
+                                                value="{{ old('position') }}">
+                                            @error('position')
+                                                <span class="text-red-500">Position is required.</span>
+                                            @enderror
+                                        </div>
                                     </div>
                                     <div class="shadow px-1 flex gap-2">
                                         <a href="{{ route('admin.event') }}"
@@ -137,10 +146,14 @@
                         <tbody>
                             @foreach ($event->judge as $j)
                                 <tr class="bg-white border-b border-slate-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-slate-100 dark:hover:bg-gray-600">
-                                    <td class="px-6 py-4 flex gap-1 items-center font-bold">
-                                        <i class="fa-solid fa-circle text-[8px] text-green-500"></i>
-                                        {{ $j->name }}
-                                    </td>
+                                    <th scope="row"
+                                            class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                                            <img class="w-10 h-10 rounded-sm"
+                                                src="{{ asset('storage').'/'.$j->profile }}" alt="Jese image">
+                                            <div class="ps-3">
+                                                <div class="text-base font-semibold">{{ $j->name }}</div>
+                                            </div>
+                                        </th>
                                     <td class="px-6 py-4">
                                         {{ $j->address }}
                                     </td>

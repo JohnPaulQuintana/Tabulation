@@ -11,7 +11,7 @@ class Judge extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['event_id','user_id','name','address','position','code'];
+    protected $fillable = ['event_id','user_id','name','address','position','code', 'profile'];
 
     public function event() :BelongsTo{
         return $this->belongsTo(Event::class);

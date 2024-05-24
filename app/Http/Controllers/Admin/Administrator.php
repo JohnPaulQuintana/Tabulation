@@ -130,28 +130,36 @@ class Administrator extends Controller
             'name' => 'required',
             'address' => 'required',
             'position' => 'required',
+            'profile' => 'required|image',  // Ensure it's an image,
         ]);
         // dd($request);
          // Generate a unique code
          $code = $this->generateUniqueCode();
         //  create user account on table
-        $judge = User::create([
-            'name' => $validated['name'],
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => Hash::make('password'),
-            'isAdmin' => false,
-            'code' => $code,
-
-        ]);
-        Judge::create([
-            'user_id' =>$judge->id,
-            'event_id' =>$request->event_id,
-            'name' =>$validated['name'],
-            'address' =>$validated['address'],
-            'position' =>$validated['position'],
-            'code' => $code,
-        ]);
+        if ($request->hasFile('profile')) {
+            // Store the uploaded file and update the user's profile picture
+            $path = $request->file('profile')->store('judge', 'public');
+            $judge = User::create([
+                'name' => $validated['name'],
+                'email' => fake()->unique()->safeEmail(),
+                'email_verified_at' => now(),
+                'password' => Hash::make('password'),
+                'isAdmin' => false,
+                'code' => $code,
+                'profile'=>$path,
+    
+            ]);
+            Judge::create([
+                'user_id' =>$judge->id,
+                'event_id' =>$request->event_id,
+                'name' =>$validated['name'],
+                'address' =>$validated['address'],
+                'position' =>$validated['position'],
+                'code' => $code,
+                'profile'=>$path,
+            ]);
+        }
+        
 
         return Redirect::route('admin.judge',$request->event_id)->with(['judge-save'=>'success']);
     }
@@ -159,7 +167,7 @@ class Administrator extends Controller
     //jugde code
     public function judgeCode(Request $request){
         // dd($request);
-        $code = Event::with('judge')->where('id',$request->event_id)->first();;
+        $code = Event::with('judge')->where('id',$request->event_id)->first();
         // dd($code);
         return response()->json(['codes'=>$code]);
     }

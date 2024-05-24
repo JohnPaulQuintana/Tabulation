@@ -24,6 +24,7 @@ class User extends Authenticatable
         'isAdmin',
         'password',
         'code',
+        'profile',
     ];
 
     /**

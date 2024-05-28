@@ -34,6 +34,21 @@
             </div>
         </div>
     </div>
+
+    @if (session('response'))
+        @include('judge.waiting.waiting',['message'=>session('response')]);
+    @endif
+
+    @section('scripts')
+        <script>
+            $(document).ready(function(){
+                $('#waitingCloseBtn').click(function(){
+                    $('#waitingBackdrop').addClass('hidden')
+                    $('#waitingModal').addClass('hidden')
+                })
+            })
+        </script>
+    @endsection
 </x-app-layout>
 
 

@@ -36,9 +36,9 @@
                                         {{ $key }}
                                     @endif
                                 </span>
-                                <button class="absolute w-fit h-fit tracking-wide top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-500 px-4 py-2 rounded-xl text-white font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
+                                <a href="#" class="absolute w-fit h-fit tracking-wide top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-500 px-4 py-2 rounded-xl text-white font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
                                     Vote
-                                </button>
+                                </a>
                             </div>
                             <div class="flex flex-col max-w-30 text-center text-sm">
                                 <span class="font-bold">{{ $candidate->name }}</span>
@@ -55,6 +55,16 @@
             </div>
         </div>
     </div>
+
+    @include('judge.vote.vote')
+    @section('scripts')
+        <script>
+            $(document).ready(function(){
+                let availablecategory = @json($eventCategory);
+                console.log(availablecategory)
+            })
+        </script>
+    @endsection
 </x-app-layout>
 
 

@@ -13,7 +13,7 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['event_id', 'category_name'];
+    protected $fillable = ['event_id', 'category_name', 'status'];
 
     public function event() :BelongsTo{
         return $this->belongsTo(Event::class);

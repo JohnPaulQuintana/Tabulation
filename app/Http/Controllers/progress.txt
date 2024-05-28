@@ -1,0 +1,9 @@
+this is the problem : $eventCategory = Event::with('category.subCategory')
+            ->where('status', true)
+            ->whereHas('category', function ($q) {
+                $q->where('status', true)
+                ->whereHas('subCategory', function ($q) {
+                    $q->where('status', true);
+                });
+            })
+            ->first();

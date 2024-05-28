@@ -38,6 +38,10 @@ Route::group(['middleware' => ['auth','verified']], function () {
         Route::post('/judge/code', [Administrator::class, 'judgeCode'])->name('judge.code');
         Route::get('/candidate/{id}', [Administrator::class, 'candidate'])->name('candidate');
         Route::post('/candidate/store', [Administrator::class, 'candidateStore'])->name('candidate.store');
+        // start the event
+        Route::get('/start/{id}', [Administrator::class, 'startEvent'])->name('event.start');
+        Route::post('/set-status', [Administrator::class, 'updateStatus'])->name('event.setStatus');
+        Route::get('/start-voting/{id}', [Administrator::class, 'startVoting'])->name('event.start.voting');
     });
 
     // judge

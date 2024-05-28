@@ -251,6 +251,56 @@ class Administrator extends Controller
         }
     }
 
+    //start the event
+    public function startEvent(Request $request){
+        $activeEvents = Event::with(['candidates', 'judge','category.subCategory'])->find($request->id);
+        // dd($activeEvents);
+        return view('admin.start', compact('activeEvents'));
+    }
+    
+    //update the event status
+    public function updateStatus(Request $request)
+    {
+        // dd($request);
+        // Validate the request data
+        $validated = $request->validate([
+            'set_status' => 'required|in:0,1',
+        ]);
+
+        // Find the event
+        $event = Event::findOrFail($request->event_id);
+
+        // Update the status
+        $event->update([
+            'status' => $validated['set_status']
+        ]);
+
+        // Return a response, possibly a redirect or a view
+        return redirect()->back()->with(['status'=>'Event status is successfully set to '. ($validated['set_status'] === '1' ? 'Online' : 'Offline')]);
+    }
+
+    //start voting
+    public function startVoting(Request $request){
+        // dd($request->id);
+        // Fetch the category using the provided ID
+        $category = Category::findOrFail($request->id);
+
+        // Check if there is already an active category
+        $activeCategory = Category::where('status', true)->first();
+
+        if ($activeCategory) {
+            // If there is an active category, return with an error message
+            return Redirect::route('admin.event.start', $category->event_id)->with(['status' => "There is already an active category ongoing. Cannot activate."]);
+        } else {
+            // If there is no active category, update the status of the fetched category to true
+            $category->update(['status' => true]);
+            return Redirect::route('admin.event.start', $category->event_id)->with(['status' => "Category is successfully set to active."]);
+        }
+        
+        // dd($category);
+        
+    }
+
     private function generateUniqueCode()
     {
         // Generate a random string of 10 alphanumeric characters

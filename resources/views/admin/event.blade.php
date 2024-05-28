@@ -183,7 +183,7 @@
                                         </td>
                                         <td class="px-6 py-4">
                                             <a href="{{ route('admin.event.edit', $ev->id) }}"><i class="fa-solid fa-pen-to-square text-xl text-red-500 hover:text-red-700"></i></a>
-                                            <a href="#"><i class="fa-solid fa-circle-play text-xl text-blue-500 hover:text-blue-700"></i></a>
+                                            <a href="{{ route('admin.event.start', $ev->id) }}"><i class="fa-solid fa-circle-play text-xl text-blue-500 hover:text-blue-700"></i></a>
                                         </td>
                                     </tr>
                                 @endforeach

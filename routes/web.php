@@ -42,6 +42,7 @@ Route::group(['middleware' => ['auth','verified']], function () {
         Route::get('/start/{id}', [Administrator::class, 'startEvent'])->name('event.start');
         Route::post('/set-status', [Administrator::class, 'updateStatus'])->name('event.setStatus');
         Route::get('/start-voting/{id}', [Administrator::class, 'startVoting'])->name('event.start.voting');
+        // Route::post('/start-voting', [Administrator::class, 'startVoting'])->name('event.start.voting');
     });
 
     // judge
@@ -49,6 +50,7 @@ Route::group(['middleware' => ['auth','verified']], function () {
         Route::group(['prefix' => 'judge','as' => 'judge.'], function () {
             Route::get('/dashboard',[JudgeController::class, 'index'])->name('dashboard');
             Route::get('/candidates',[JudgeController::class, 'candidates'])->name('candidates');
+            Route::post('/vote',[JudgeController::class, 'vote'])->name('vote');
         });
     });
 });

@@ -66,7 +66,8 @@
                                             </div>
                                         </div>
                                         
-                                        <div class="shadow col-span-3 px-1">
+                                        <div class="shadow col-span-3 flex gap-2 px-1">
+                                            <a href="{{ route('admin.event') }}" class="bg-red-500 text-center text-white p-1 w-full hover:bg-red-700">Cancel</a>
                                             <button type="submit"
                                                 class="bg-blue-500 hover:cursor-pointer hover:bg-blue-700 p-1 w-full text-white rounded-sm">Update
                                                 Event</button>

@@ -42,7 +42,8 @@ Route::group(['middleware' => ['auth','verified']], function () {
         Route::get('/start/{id}', [Administrator::class, 'startEvent'])->name('event.start');
         Route::post('/set-status', [Administrator::class, 'updateStatus'])->name('event.setStatus');
         Route::get('/start-voting/{id}', [Administrator::class, 'startVoting'])->name('event.start.voting');
-        // Route::post('/start-voting', [Administrator::class, 'startVoting'])->name('event.start.voting');
+        Route::get('/edit', [Administrator::class, 'edit'])->name('category.edit');
+        Route::post('/update', [Administrator::class, 'update'])->name('category.update');
     });
 
     // judge

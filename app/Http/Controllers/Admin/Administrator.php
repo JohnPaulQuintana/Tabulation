@@ -325,6 +325,26 @@ class Administrator extends Controller
 
     }
 
+    public function edit(Request $request){
+        // dd($request);
+        $category = Category::with('subCategory')->find($request->id);
+        // dd($category);
+        return response()->json(['category'=>$category]);
+    }
+
+    public function update(Request $request){
+        // dd($request);
+        $category = Category::with(['subCategory','event'])->find($request->category_id);
+        $category->update(['category_name'=>$request->category_name]);
+        foreach ($request->criteria as $k => $c) {
+            // dd($k);
+            $category->subCategory[$k]->update(['sub_category'=>$c,'percentage'=>$request->percentage[$k]]);
+        }
+
+        return Redirect::route('admin.event.start', $category->event_id)->with(['updates' => "Category is updated successfully."]);
+        
+    }
+
     private function generateUniqueCode()
     {
         // Generate a random string of 10 alphanumeric characters

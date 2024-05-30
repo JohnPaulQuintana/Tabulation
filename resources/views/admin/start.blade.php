@@ -214,7 +214,11 @@
         @if (session('status'))
             @include('admin.popup.status', ['status'=>session('status')])
         @endif
+        @if (session('updates'))
+            @include('admin.popup.update', ['status'=>session('updates')])
+        @endif
 
+        @include('admin.category.edit')
         @section('scripts')
             <script>
                 $(document).ready(function(){
@@ -222,11 +226,77 @@
                         $('#statusBackdrop').addClass('hidden')
                         $('#statusModal').addClass('hidden')
                     })
+                    $('#updatedCloseBtn').click(function(){
+                        $('#updatedBackdrop').addClass('hidden')
+                        $('#updatedModal').addClass('hidden')
+                    })
+
 
                     $('.editCategory').click(function(){
-                        alert($(this).data('category'))
+                        // alert($(this).data('category'))
+                        let data = {id:$(this).data('category')}
+                        let renderCriteria = ''
+                        sendRequest('GET', '{{ route('admin.category.edit') }}', data)
+                            .then(function(res){
+                                console.log(res)
+                                res.category.sub_category.forEach(sc => {
+                                    console.log(sc)
+                                    renderCriteria += `
+                                    <div class="flex gap-2 justify-between items-center shadow mb-2 p-2">
+                                        <div class="">
+                                            <label for="">Criteria:</label>
+                                            <input type="text" name="criteria[]" value="${sc.sub_category}" class="rounded-md w-full">
+                                        </div>
+                                        
+                                        <div class="">
+                                            <label for="">Percentage:</label>
+                                            <input type="number" name="percentage[]" value="${sc.percentage}" class="rounded-md w-full">
+                                        </div>
+                                    </div>
+                                    `
+                                });
+                                $('#category_id').val(res.category.id)
+                                $('#category_name').val(res.category.category_name)
+                                $('#renderEditCriteriaContainer').html(renderCriteria)
+                                $('#editBackdrop').removeClass('hidden')
+                                $('#editModal').removeClass('hidden')
+                            })
+                            .catch(function(err){
+                                console.log(err)
+                            })
+                    })
+
+                    $('#editCloseBtn').click(function(){
+                        $('#editBackdrop').addClass('hidden')
+                        $('#editModal').addClass('hidden')
                     })
                 })
+
+                //dynamic request
+                function sendRequest(method, url, data = {}) {
+                    return new Promise(function(resolve, reject) {
+                        // Get the CSRF token from the meta tag
+                        var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+                        // Add the CSRF token to the data object
+                        data._token = csrfToken;
+
+                        $.ajax({
+                            method: method,
+                            url: url,
+                            data: data,
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken // Include CSRF token in the request headers
+                            },
+                            success: function(response) {
+                                resolve(response);
+                            },
+                            error: function(xhr, status, error) {
+                                reject(error);
+                            }
+                        });
+                    });
+                }
             </script>
         @endsection
 </x-app-layout>

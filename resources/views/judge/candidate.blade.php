@@ -22,6 +22,9 @@
                 <div class="flex gap-4 shadow px-2">
                     @include('judge.indicator.steps', ['categories'=>$activeEvent->category])
                 </div>
+                <div class="p-1">
+                    <p><span class="text-red-500">Note: </span>All the Candidate's are required to have a vote. just click there profile to start voting...</p>
+                </div>
                 <div class="bg-white rounded-md p-2 shadow-2 mt-4 flex flex-wrap gap-4">
                     {{-- {{ $activeEvent->candidates }} --}}
                     @foreach ($activeEvent->candidates as $key => $candidate)

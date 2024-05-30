@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 use Spatie\FlareClient\View;
 use Illuminate\Support\Facades\Storage;
+
 class Administrator extends Controller
 {
     public function index()
@@ -25,7 +26,7 @@ class Administrator extends Controller
 
     public function event()
     {
-        $events = Event::with(['category', 'category.subCategory','judge', 'candidates'])->where('type','!=','System Message')->orderByDesc('created_at')->get();
+        $events = Event::with(['category', 'category.subCategory', 'judge', 'candidates'])->where('type', '!=', 'System Message')->orderByDesc('created_at')->get();
         // dd($events);
         return view('admin.event', compact('events'));
     }
@@ -66,17 +67,19 @@ class Administrator extends Controller
                 'image' => $path,
             ]);
 
-            
+
             return Redirect::route('admin.event')->with('status', 'success');
         }
     }
     //edit events
-    public function editEvent(Request $request){
+    public function editEvent(Request $request)
+    {
         $edit = Event::find($request->id);
-        return view('admin.event.edit',compact('edit'));
+        return view('admin.event.edit', compact('edit'));
     }
     //update events
-    public function updateEvent(Request $request){
+    public function updateEvent(Request $request)
+    {
         // dd($request);
         // Validate the request...
         $validated = $request->validate([
@@ -89,8 +92,8 @@ class Administrator extends Controller
             'event_date' => 'required',
         ]);
 
-        
-         // Find the event
+
+        // Find the event
         $event = Event::findOrFail($request->event_id);
         // Check if a new image file is uploaded
         if ($request->hasFile('event_image')) {
@@ -148,7 +151,7 @@ class Administrator extends Controller
             if ($value !== null) {
                 // Check if the percentage value for this subcategory is not null
                 $percentage = isset($request->percentage[$key]) ? $request->percentage[$key] : null;
-        
+
                 // Create the SubCategory only if the percentage value is not null
                 if ($percentage !== null) {
                     SubCategory::create([
@@ -160,18 +163,20 @@ class Administrator extends Controller
             }
         }
 
-        return Redirect::route('admin.category', $request->event_id)->with(['save_category'=>'success','event_id'=>$request->event_id, 'message'=>'Category is successfully added!']);
+        return Redirect::route('admin.category', $request->event_id)->with(['save_category' => 'success', 'event_id' => $request->event_id, 'message' => 'Category is successfully added!']);
     }
 
     //judge
-    public function judge(Request $request){
+    public function judge(Request $request)
+    {
         $event_id = $request->id;
         $event = Event::with(['category', 'judge'])->find($event_id);
         // dd($event);
         return view('admin.judge.judge', compact('event'));
     }
     //store Jusge
-    public function judgeStore(Request $request){
+    public function judgeStore(Request $request)
+    {
         $validated = $request->validate([
             'name' => 'required',
             'address' => 'required',
@@ -179,8 +184,8 @@ class Administrator extends Controller
             'profile' => 'required|image',  // Ensure it's an image,
         ]);
         // dd($request);
-         // Generate a unique code
-         $code = $this->generateUniqueCode();
+        // Generate a unique code
+        $code = $this->generateUniqueCode();
         //  create user account on table
         if ($request->hasFile('profile')) {
             // Store the uploaded file and update the user's profile picture
@@ -192,34 +197,36 @@ class Administrator extends Controller
                 'password' => Hash::make('password'),
                 'isAdmin' => false,
                 'code' => $code,
-                'profile'=>$path,
-    
+                'profile' => $path,
+
             ]);
             Judge::create([
-                'user_id' =>$judge->id,
-                'event_id' =>$request->event_id,
-                'name' =>$validated['name'],
-                'address' =>$validated['address'],
-                'position' =>$validated['position'],
+                'user_id' => $judge->id,
+                'event_id' => $request->event_id,
+                'name' => $validated['name'],
+                'address' => $validated['address'],
+                'position' => $validated['position'],
                 'code' => $code,
-                'profile'=>$path,
+                'profile' => $path,
             ]);
         }
-        
 
-        return Redirect::route('admin.judge',$request->event_id)->with(['judge-save'=>'success']);
+
+        return Redirect::route('admin.judge', $request->event_id)->with(['judge-save' => 'success']);
     }
 
     //jugde code
-    public function judgeCode(Request $request){
+    public function judgeCode(Request $request)
+    {
         // dd($request);
-        $code = Event::with('judge')->where('id',$request->event_id)->first();
+        $code = Event::with('judge')->where('id', $request->event_id)->first();
         // dd($code);
-        return response()->json(['codes'=>$code]);
+        return response()->json(['codes' => $code]);
     }
 
     //candidate
-    public function candidate(Request $request){
+    public function candidate(Request $request)
+    {
         $event_id = $request->id;
         $event = Event::with(['category', 'judge'])->find($event_id);
         // dd($event);
@@ -227,37 +234,48 @@ class Administrator extends Controller
     }
 
     //store candidate
-    public function candidateStore(Request $request){
+    public function candidateStore(Request $request)
+    {
         // dd($request);
         $validated = $request->validate([
             'name' => 'required',
             'age' => 'required',
             'profile' => 'required|image',  // Ensure it's an image,
         ]);
-        
+
         if ($request->hasFile('profile')) {
             // Store the uploaded file and update the user's profile picture
             $path = $request->file('profile')->store('profile', 'public');
 
             Candidate::create([
-                'event_id'=>$request->event_id,
-                'name'=>$validated['name'],
-                'age'=>$validated['age'],
-                'profile'=>$path,
+                'event_id' => $request->event_id,
+                'name' => $validated['name'],
+                'age' => $validated['age'],
+                'profile' => $path,
             ]);
 
-            
-            return Redirect::route('admin.candidate',$request->event_id)->with('candidate-status', 'success');
+
+            return Redirect::route('admin.candidate', $request->event_id)->with('candidate-status', 'success');
         }
     }
 
     //start the event
-    public function startEvent(Request $request){
-        $activeEvents = Event::with(['candidates', 'judge','category.subCategory'])->find($request->id);
-        // dd($activeEvents);
+    public function startEvent(Request $request)
+    {
+        $activeEvents = Event::with(['candidates.votes', 'judge', 'category.subCategory'])->find($request->id);
+        $activeCategory = Category::with('subCategory')->where('status', true)->first();
+        // dd($activeCategory);
+        // dd();
+        // Iterate over each candidate
+        foreach ($activeEvents->candidates as $candidate) {
+            $votePerCandidates = $this->calculateTotalPerCriteria($candidate, $activeCategory->subCategory);
+            // dd($votePerCandidates);
+            $candidate->totalPerCriteria = $votePerCandidates;
+        }
+        dd($activeEvents);
         return view('admin.start', compact('activeEvents'));
     }
-    
+
     //update the event status
     public function updateStatus(Request $request)
     {
@@ -276,11 +294,12 @@ class Administrator extends Controller
         ]);
 
         // Return a response, possibly a redirect or a view
-        return redirect()->back()->with(['status'=>'Event status is successfully set to '. ($validated['set_status'] === '1' ? 'Online' : 'Offline')]);
+        return redirect()->back()->with(['status' => 'Event status is successfully set to ' . ($validated['set_status'] === '1' ? 'Online' : 'Offline')]);
     }
 
     //start voting
-    public function startVoting(Request $request){
+    public function startVoting(Request $request)
+    {
         // dd($request->id);
         // Fetch the category using the provided ID
         $category = Category::findOrFail($request->id);
@@ -296,14 +315,33 @@ class Administrator extends Controller
             $category->update(['status' => true]);
             return Redirect::route('admin.event.start', $category->event_id)->with(['status' => "Category is successfully set to active."]);
         }
-        
+
         // dd($category);
-        
+
     }
 
     private function generateUniqueCode()
     {
         // Generate a random string of 10 alphanumeric characters
         return strtoupper(Str::random(10));
+    }
+
+    private function calculateTotalPerCriteria($candidate, $subCategories)
+    {
+        dd($subCategories);
+        $candidateVotesPerCriteria = []; // Initialize here to reset for each candidate
+        
+            foreach ($candidate->votes as $vote) {
+                $candidateVotes = json_decode($vote->criteria, true);
+        
+                foreach ($candidateVotes as $criteriaKey => $value) {
+                    if (!isset($candidateVotesPerCriteria[$criteriaKey])) {
+                        $candidateVotesPerCriteria[$criteriaKey] = 0;
+                    }
+                    $candidateVotesPerCriteria[$criteriaKey] += $value;
+                }
+            }
+        return $candidateVotesPerCriteria;
+        
     }
 }

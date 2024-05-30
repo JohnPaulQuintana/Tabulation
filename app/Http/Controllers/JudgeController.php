@@ -38,9 +38,16 @@ class JudgeController extends Controller
             ->first();
 
         if ($eventCategory) {
-            $candidatesWithVotesInCategory = Candidate::whereHas('votes', function ($query) use ($eventCategory) {
-                $query->where('category_id', $eventCategory->id)->where('judge_id', Auth::user()->id);
-            })->get();
+            $categoryId = $eventCategory->id;
+            $judgeId = Auth::user()->id;
+            $candidatesWithVotesInCategory = Candidate::whereHas('votes', function ($query) use ($categoryId, $judgeId) {
+                $query->where('category_id', $categoryId)->where('judge_id', $judgeId);
+            })->with(['votes' => function ($query) use ($categoryId, $judgeId) {
+                $query->select('id', 'candidate_id','judge_id')->where('category_id', $categoryId)->where('judge_id', $judgeId);
+            }])
+            ->get();
+
+            
         }
 
         // dd($candidatesWithVotesInCategory);
@@ -56,11 +63,12 @@ class JudgeController extends Controller
     {
         $criteriaVotes = [];
         $activeCategory = Category::with('subCategory')->where('status',true)->first();
-        // dd($request->criteria);
+       
         foreach ($activeCategory->subCategory as $key => $criteria) {
+            // dd($criteria->sub_category);
             $criteriaVotes[$criteria->sub_category] = intval($request->criteria[$key]);
         }
-        // dd($criteriaVotes);
+        // dd($request->criteria);
         Vote::create([
             'candidate_id' => $request->candidate_id,
             'judge_id' => Auth::user()->id,
@@ -68,6 +76,27 @@ class JudgeController extends Controller
             'criteria' => json_encode($criteriaVotes)
         ]);
 
+        return Redirect::route('judge.candidates')->with(['status' => true, 'message' => 'Successfully recorded your votes!']);
+    }
+
+    //edit
+    public function edit(Request $request){
+        // dd($request->id);
+        $vote = Vote::find($request->id);
+        // dd($vote);
+        return response()->json(['vote'=>$vote]);
+    }
+    //update
+    public function update(Request $request){
+        // dd($request);
+        $criteriaVotes = [];
+        $activeCategory = Category::with('subCategory')->where('status',true)->first();
+       
+        foreach ($activeCategory->subCategory as $key => $criteria) {
+            $criteriaVotes[$criteria->sub_category] = intval($request->criteria[$key]);
+        }
+
+        $updateVote = Vote::find($request->vote_id)->update(['criteria'=>json_encode($criteriaVotes)]);
         return Redirect::route('judge.candidates')->with(['status' => true, 'message' => 'Successfully recorded your votes!']);
     }
 }

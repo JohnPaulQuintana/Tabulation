@@ -51,6 +51,8 @@ Route::group(['middleware' => ['auth','verified']], function () {
             Route::get('/dashboard',[JudgeController::class, 'index'])->name('dashboard');
             Route::get('/candidates',[JudgeController::class, 'candidates'])->name('candidates');
             Route::post('/vote',[JudgeController::class, 'vote'])->name('vote');
+            Route::get('/edit',[JudgeController::class, 'edit'])->name('edit');
+            Route::post('/update',[JudgeController::class, 'update'])->name('update');
         });
     });
 });

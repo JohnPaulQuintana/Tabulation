@@ -262,18 +262,24 @@ class Administrator extends Controller
     //start the event
     public function startEvent(Request $request)
     {
-        $activeEvents = Event::with(['candidates.votes', 'judge', 'category.subCategory'])->find($request->id);
+       
         $activeCategory = Category::with('subCategory')->where('status', true)->first();
+        // dd($activeCategory);
+        $activeEvents = Event::with([
+            'candidates.votes'=>function($q) use ($activeCategory){
+                $q->where('category_id', $activeCategory->id);
+            }
+            ,'judge', 'category.subCategory'])->find($request->id);
         // dd($activeCategory);
         // dd();
         // Iterate over each candidate
         foreach ($activeEvents->candidates as $candidate) {
             $votePerCandidates = $this->calculateTotalPerCriteria($candidate, $activeCategory->subCategory);
             // dd($votePerCandidates);
-            $candidate->totalPerCriteria = $votePerCandidates;
+            $candidate->vote_results = $votePerCandidates;
         }
-        dd($activeEvents);
-        return view('admin.start', compact('activeEvents'));
+        // dd($activeEvents);
+        return view('admin.start', compact('activeEvents', 'activeCategory'));
     }
 
     //update the event status
@@ -308,13 +314,12 @@ class Administrator extends Controller
         $activeCategory = Category::where('status', true)->first();
 
         if ($activeCategory) {
+            $activeCategory->update(['status'=>false]);
             // If there is an active category, return with an error message
-            return Redirect::route('admin.event.start', $category->event_id)->with(['status' => "There is already an active category ongoing. Cannot activate."]);
-        } else {
-            // If there is no active category, update the status of the fetched category to true
-            $category->update(['status' => true]);
-            return Redirect::route('admin.event.start', $category->event_id)->with(['status' => "Category is successfully set to active."]);
+            // return Redirect::route('admin.event.start', $category->event_id)->with(['status' => "There is already an active category ongoing. Cannot activate."]);
         }
+        $category->update(['status' => true]);
+        return Redirect::route('admin.event.start', $category->event_id)->with(['status' => "Category is successfully set to active."]);
 
         // dd($category);
 
@@ -328,20 +333,24 @@ class Administrator extends Controller
 
     private function calculateTotalPerCriteria($candidate, $subCategories)
     {
-        dd($subCategories);
+        // dd($subCategories);
         $candidateVotesPerCriteria = []; // Initialize here to reset for each candidate
-        
-            foreach ($candidate->votes as $vote) {
-                $candidateVotes = json_decode($vote->criteria, true);
-        
-                foreach ($candidateVotes as $criteriaKey => $value) {
-                    if (!isset($candidateVotesPerCriteria[$criteriaKey])) {
-                        $candidateVotesPerCriteria[$criteriaKey] = 0;
-                    }
-                    $candidateVotesPerCriteria[$criteriaKey] += $value;
+
+        foreach ($candidate->votes as $vote) {
+            $candidateVotes = json_decode($vote->criteria, true);
+            $c = 0;
+            foreach ($candidateVotes as $criteriaKey => $value) {
+                if (!isset($candidateVotesPerCriteria[$criteriaKey])) {
+                    $candidateVotesPerCriteria[$criteriaKey] = 0;
                 }
+                $percentage = $subCategories[$c]->percentage / 100;
+                $candidateVotesPerCriteria[$criteriaKey] += ($value * $percentage);
+                $c++;
             }
+        }
+        // Calculate the total by summing all criteria scores
+        $candidateVotesPerCriteria['total'] = (array_sum($candidateVotesPerCriteria));
+
         return $candidateVotesPerCriteria;
-        
     }
 }

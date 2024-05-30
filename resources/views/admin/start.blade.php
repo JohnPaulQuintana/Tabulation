@@ -102,7 +102,7 @@
                                                         Category
                                                     </th>
                                                     <th scope="col" class="px-6 py-3">
-                                                        Votes
+                                                        Total Votes (%)
                                                     </th>
                                                     <th scope="col" class="px-6 py-3">
                                                         Percentage
@@ -110,14 +110,21 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach ($activeEvents->candidates as $candidate)
+                                                @php
+                                                    // Extract candidates and sort by vote_results['total'] in descending order
+                                                    $sortedCandidates = $activeEvents->candidates->sortByDesc(function($candidate) {
+                                                        return $candidate->vote_results['total'];
+                                                    });
+                                                @endphp
+
+                                                @foreach ($sortedCandidates as $candidate)
                                                     <tr class="bg-white border-b border-slate-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-slate-100 dark:hover:bg-gray-600">
                                                         <td class="w-4 p-4">
                                                             <div class="flex items-center">
                                                                 <i class="fa-solid fa-square-check text-2xl text-green-500"></i>
                                                             </div>
                                                         </td>
-                                                        <th scope="row"
+                                                        <td scope="row"
                                                             class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
                                                             <img class="w-10 h-10 rounded-sm"
                                                                 src="{{ asset('storage').'/'.$candidate->profile }}" alt="Jese image">
@@ -125,7 +132,22 @@
                                                                 <div class="text-base font-semibold">{{ $candidate->name }}</div>
                                                                 <div class="font-normal text-gray-500">Santiago City</div>
                                                             </div>
-                                                        </th>
+                                                        </td>
+                                                        <td class="p-4">
+                                                            <div class="flex items-center">
+                                                                {{ $activeCategory->category_name }}
+                                                            </div>
+                                                        </td>
+                                                        <td class="p-4">
+                                                            <div class="flex items-center">
+                                                                {{ $candidate->vote_results['total'] }}%
+                                                            </div>
+                                                        </td>
+                                                        <td class="p-4">
+                                                            <div class="flex items-center">
+                                                                {{ __('100%') }}
+                                                            </div>
+                                                        </td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>

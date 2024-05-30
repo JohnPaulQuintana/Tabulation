@@ -41,22 +41,31 @@
                                         {{ $key }}
                                     @endif
                                 </span>
-                                @if (count($candidatesWithVotesInCategory) == 0)
+                                @php
+                                    $alreadyVoted = [];
+                                @endphp
+                                @foreach ($candidatesWithVotesInCategory as $voted)
+                                {{-- {{ $voted->votes }} --}}
+                                    @if ($voted->id == $candidate->id)
+                                        <a data-vote_id="{{ $voted->votes[0]->id }}" data-name="{{ $candidate->name }}" href="#" class="editVote absolute w-fit h-fit tracking-wide top-1 right-1 transform bg-green-500 px-1 py-1 rounded-md text-white font-bold text-sm opacity-100 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </a>
+                                        <a data-candidate_id="{{ $candidate->id }}" data-name="{{ $candidate->name }}" href="#" class="absolute w-fit h-fit tracking-wide top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-500 px-4 py-2 rounded-xl text-white font-bold text-sm opacity-60 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
+                                            Voted
+                                        </a>
+                                        @php 
+                                            $alreadyVoted[] = $candidate->id;
+                                        @endphp
+                                        @break
+                                    @endif
+                                @endforeach
+                            
+                                @if (!in_array($candidate->id, $alreadyVoted))
                                     <a data-candidate_id="{{ $candidate->id }}" data-name="{{ $candidate->name }}" href="#" class="absolute voteNow w-fit h-fit tracking-wide top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-500 px-4 py-2 rounded-xl text-white font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
                                         Vote
                                     </a>  
                                 @endif
-                               @foreach ($candidatesWithVotesInCategory as $voted)
-                                   @if ($voted->id == $candidate->id)
-                                        <a data-candidate_id="{{ $candidate->id }}" data-name="{{ $candidate->name }}" href="#" class="absolute w-fit h-fit tracking-wide top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-500 px-4 py-2 rounded-xl text-white font-bold text-sm opacity-100 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
-                                            Voted
-                                        </a>
-                                    @else
-                                        <a data-candidate_id="{{ $candidate->id }}" data-name="{{ $candidate->name }}" href="#" class="absolute voteNow w-fit h-fit tracking-wide top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-500 px-4 py-2 rounded-xl text-white font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
-                                            Vote
-                                        </a> 
-                                   @endif
-                               @endforeach
+                            
                                 
                             </div>
                             <div class="flex flex-col max-w-30 text-center text-sm">
@@ -76,11 +85,14 @@
     </div>
 
     @include('judge.vote.vote')
+    @include('judge.vote.edit')
     @section('scripts')
+    
         <script>
+            let availablecategory = @json($eventCategory);
+            let statusVote = @json(session('message'));
             $(document).ready(function(){
-                let availablecategory = @json($eventCategory);
-                let statusVote = @json(session('message'));
+                
                 
                 // console.log(availablecategory)
 
@@ -106,6 +118,22 @@
                     $('#voteBackdrop').addClass('hidden')
                     $('#voteModal').addClass('hidden')
                 })
+
+                //edit vote
+                $('.editVote').click(function(){
+                    // alert($(this).data('vote_id'))
+                    $('#vote_id').val($(this).data('vote_id'))
+                    $('#editCandidateName').text($(this).data('name'))
+                    $('#editCategoryName').text(availablecategory.category_name)
+                    edit($(this).data('vote_id'))
+                    $('#editBackdrop').removeClass('hidden')
+                    $('#editModal').removeClass('hidden')
+                })
+                $('#editCloseBtn').click(function(){
+                    $('#editBackdrop').addClass('hidden')
+                    $('#editModal').addClass('hidden')
+                })
+
             })
 
             const render = (criteria) => {
@@ -131,6 +159,64 @@
                     showConfirmButton: false  // Hide the confirmation button
                 });
 
+            }
+
+            const edit = (id) => {
+                let data = {id:id}
+                sendRequest('GET', '{{ route('judge.edit') }}', data)
+                .then(function(res){
+                    // console.log()
+                    let data = JSON.parse(res.vote.criteria)
+                    // console.log(data)
+                    let renderCriteria = ''
+                    for (const key in data) {
+                        if (data.hasOwnProperty(key)) {
+                            const value = data[key];
+                            // console.log('Key:', key, 'Value:', value);
+                            availablecategory.sub_category.forEach(sc => {
+                                if(key === sc.sub_category){
+                                    renderCriteria += `
+                                        <div class="flex justify-between items-center font-bold shadow mb-2 p-2">
+                                            <label for="criteria">${key}: <span>- ${sc.percentage}%</span></label>
+                                            <input type="number" name="criteria[]" value="${value}" class="rounded-md" required>
+                                        </div>
+                                    `
+                                }
+                            });
+                            
+                        }
+                    }
+                    $('#renderEditCriteriaContainer').html(renderCriteria)
+                    
+                })
+                .catch(function(err){
+                    console.log(err)
+                })
+            }
+            //dynamic request
+            function sendRequest(method, url, data = {}) {
+                return new Promise(function(resolve, reject) {
+                    // Get the CSRF token from the meta tag
+                    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+                    // Add the CSRF token to the data object
+                    data._token = csrfToken;
+
+                    $.ajax({
+                        method: method,
+                        url: url,
+                        data: data,
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken // Include CSRF token in the request headers
+                        },
+                        success: function(response) {
+                            resolve(response);
+                        },
+                        error: function(xhr, status, error) {
+                            reject(error);
+                        }
+                    });
+                });
             }
         </script>
     @endsection

@@ -165,13 +165,17 @@
                                 {{-- {{ $activeEvents->category }} --}}
                                 @foreach ($activeEvents->category as $category)
                                     <div class="flex-shrink-0 w-64 shadow p-4 items-center">
-                                        <h1 class="font-semibold mb-2">
-                                            @if ($category->status)
+                                        <h1 class="font-semibold mb-2 flex justify-between items-center">
+                                            <div>
+                                                @if ($category->status)
                                                 <i class="fa-solid fa-circle text-xs text-green-500"></i>
-                                            @else
-                                            <i class="fa-solid fa-circle text-xs text-red-500"></i>
-                                            @endif
-                                             {{ $category->category_name }}
+                                                @else
+                                                <i class="fa-solid fa-circle text-xs text-red-500"></i>
+                                                @endif
+                                                <span>{{ $category->category_name }}</span>
+                                            </div>
+
+                                            <a data-category="{{ $category->id }}" href="#" class="editCategory text-blue-500 px-1 rounded-md hover:text-blue-700"><i class="fa-solid fa-pen-to-square"></i></a>
                                         </h1>
                                         @foreach ($category->subCategory as $sub)
                                             <div class="flex justify-between items-center gap-2 bg-slate-100 p-1 capitalize">
@@ -217,6 +221,10 @@
                     $('#statusCloseBtn').click(function(){
                         $('#statusBackdrop').addClass('hidden')
                         $('#statusModal').addClass('hidden')
+                    })
+
+                    $('.editCategory').click(function(){
+                        alert($(this).data('category'))
                     })
                 })
             </script>

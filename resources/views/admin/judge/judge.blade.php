@@ -39,19 +39,26 @@
                                                 alt="" srcset="">
                                         </div>
                                         <div class="shadow col-span-2 px-1 bg-slate-100">
-                                            <span class="font-bold uppercase text-blue-500">{{ $event->name }}</span>
+                                            <h1 class="font-bold uppercase text-slate-500 text-center">{{ $event->name }}</h1>
                                             <p>{{ $event->details }}</p>
-                                            <p class="text-blue-500">{{ $event->created_at->format('F j, Y') }}</p>
-                                        </div>
-                                        <div class="shadow col-span-3 p-2">
-                                            <span class="font-bold">Category</span>
-                                            @foreach ($event->category as $c)
-                                                <div class="flex items-center gap-2 p-1 bg-slate-100 capitalize">
-                                                    <i class="fa-solid fa-circle text-[8px] text-green-500"></i>
-                                                    <span>{{ $c->category_name }}</span>
+                                            <p class="text-white bg-slate-500 text-center">Date: {{ $event->created_at->format('F j, Y') }}</p>
+                                            <div class="shadow p-2">
+                                                <span class="font-bold">Category</span>
+                                                <div class="flex flex-wrap gap-2">
+                                                    @foreach ($event->category as $c)
+                                                        <div class="flex items-center gap-2 p-1 bg-slate-50 capitalize shadow-2 rounded-sm">
+                                                            @if ($c->status)
+                                                                <i class="fa-solid fa-circle text-[8px] text-green-500"></i>
+                                                            @else
+                                                                <i class="fa-solid fa-circle text-[8px] text-red-500"></i>
+                                                            @endif
+                                                            <span>{{ $c->category_name }}</span>
+                                                        </div>
+                                                    @endforeach
                                                 </div>
-                                            @endforeach
+                                            </div>
                                         </div>
+                                        
 
 
                                     </div>
@@ -168,7 +175,7 @@
                                         {{ $j->created_at }}
                                     </td>
                                     <td class="px-6 py-4 text-blue-500">
-                                        <a href="#">
+                                        <a href="#" data-judge_id="{{ $j->id }}" class="editJudge">
                                             <i class="fa-solid fa-pen-to-square text-xl hover:text-blue-700"></i>
                                         </a>
                                     </td>
@@ -181,9 +188,10 @@
         </div>
 
         @include('admin.judge.template.code')
+        @include('admin.judge.edit')
 
         @if (session('judge-save'))
-            @include('admin.popup.judge')
+            @include('admin.popup.judge',['message'=>session('message')])
         @endif
         
     </div>
@@ -191,6 +199,8 @@
     @section('scripts')
         <script>
             $(document).ready(function() {
+                let judges = @json($event->judge);
+                // console.log(judges)
                 $('#judgeCloseBtn').click(function(){
                     $('#judgeBackdrop').addClass('hidden')
                     $('#judgeModal').addClass('hidden')
@@ -229,6 +239,53 @@
                 $('#printCancelBtn').click(function(){
                     $('#codeModal').addClass('hidden')
                     $('#codeBackdrop').addClass('hidden')
+                })
+
+                $('#editJudgeCloseBtn').click(function(){
+                    $('#editJudgeBackdrop').addClass('hidden')
+                    $('#editJudgeModal').addClass('hidden')
+                })
+
+                $('.editJudge').click(function(){
+                    // alert()
+                    let judgeId = $(this).data('judge_id');
+                    let renderJudge = ''
+                    judges.forEach(j=>{
+                        if(j.id === judgeId){
+                            console.log(j)
+                            renderJudge = `
+                            <input type="number" name="judge_id" id="judge_id" value="${j.id}" class="hidden">
+                            <div class="flex flex-col shadow mb-2 p-2">
+                                <label for="">Profile:</label>
+                                <div class="flex gap-2 items-center">
+                                    <img class="w-30 h-30 rounded-md" src="{{ asset('storage') }}/${j.profile}" alt="profile">
+                                    <input type="file" id="judge_profile" name="judge_profile" value="" class="rounded-md flex-1">
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-2 shadow mb-2 p-2">
+                                <div class="grid grid-cols-2 gap-2 items-center shadow mb-2 p-2">
+                                    <div class="">
+                                        <label for="">Name:</label>
+                                        <input type="text" name="name" id="judge_name" value="${j.name}" class="rounded-md w-full">
+                                    </div>
+                                    
+                                    <div class="">
+                                        <label for="">Position:</label>
+                                        <input type="text" name="position" id="judge_position" value="${j.address}" class="rounded-md w-full">
+                                    </div>
+                                    <div class="col-span-2">
+                                        <label for="">Address:</label>
+                                        <input type="text" name="address" id="judge_address" value="${j.position}" class="rounded-md w-full">
+                                    </div>
+                                </div>
+                            </div>
+                            `
+                            $('#renderEditJudgeContainer').html(renderJudge)
+
+                            $('#editJudgeBackdrop').removeClass('hidden')
+                            $('#editJudgeModal').removeClass('hidden')
+                        }
+                    })
                 })
 
                 

@@ -125,7 +125,7 @@ class Administrator extends Controller
     public function category(Request $request)
     {
         $event_id = $request->id;
-        $categories = Category::where('event_id', $event_id)->with('subCategory')->get();
+        $categories = Category::where('event_id', $event_id)->with('subCategory')->latest()->get();
         // dd($categories);
         return view('admin.category.category', compact('event_id', 'categories'));
     }
@@ -212,9 +212,21 @@ class Administrator extends Controller
         }
 
 
-        return Redirect::route('admin.judge', $request->event_id)->with(['judge-save' => 'success']);
+        return Redirect::route('admin.judge', $request->event_id)->with(['judge-save' => 'success', 'message'=>'A new judge has been successfully added to the event.']);
     }
 
+    //judge update
+    public function judgeUpdate(Request $request){
+        // dd($request);
+        $judge = Judge::with('event')->find($request->judge_id);
+        if($request->hasFile('judge_profile')){
+            $path = $request->file('judge_profile')->store('judge', 'public');
+            $judge->update(['profile'=>$path]);  
+        }
+
+        $judge->update(['name'=>$request->name,'address'=>$request->address,'position'=>$request->position]);
+        return Redirect::route('admin.judge', $judge->event->id)->with(['judge-save' => 'success', 'message'=>'Judge '.$judge->name.' has been updated successfully.']);
+    }
     //jugde code
     public function judgeCode(Request $request)
     {
@@ -228,7 +240,7 @@ class Administrator extends Controller
     public function candidate(Request $request)
     {
         $event_id = $request->id;
-        $event = Event::with(['category', 'judge'])->find($event_id);
+        $event = Event::with(['category', 'judge','candidates'])->find($event_id);
         // dd($event);
         return view('admin.candidate.candidate', compact('event'));
     }
@@ -255,15 +267,42 @@ class Administrator extends Controller
             ]);
 
 
-            return Redirect::route('admin.candidate', $request->event_id)->with('candidate-status', 'success');
+            return Redirect::route('admin.candidate', $request->event_id)->with(['candidate-status'=>'success', 'message'=>'A new candidate has been successfully added to the event.']);
         }
     }
 
+    //candidate update
+    public function candidateUpdate(Request $request){
+        // dd($request);
+        $candidate = Candidate::with('event')->find($request->candidate_id);
+        if($request->hasFile('candidate_profile')){
+            $path = $request->file('candidate_profile')->store('profile', 'public');
+            $candidate->update(['profile'=>$path]);  
+        }
+
+        $candidate->update(['name'=>$request->name,'age'=>$request->age]);
+        return Redirect::route('admin.candidate', $candidate->event->id)->with(['candidate-status'=>'success', 'message'=>'Candidate '.$candidate->name.' is successfully updated!']);
+    }
+
+    //cadidate destory
+    public function candidateDestroy(Request $request){
+        // dd($request->id);
+        $candidate = Candidate::with('event')->find($request->id);
+
+        if($candidate){
+            $candidate->delete();
+        }
+
+        return Redirect::route('admin.candidate', $candidate->event->id)->with(['candidate-status'=>'success', 'message'=>'Candidate '.$candidate->name.' is successfully deleted!']);
+    }
     //start the event
     public function startEvent(Request $request)
     {
        
         $activeCategory = Category::with('subCategory')->where('status', true)->first();
+        if(!$activeCategory){
+            $activeCategory = Category::with('subCategory')->where('status', false)->first();
+        }
         // dd($activeCategory);
         $activeEvents = Event::with([
             'candidates.votes'=>function($q) use ($activeCategory){
@@ -325,24 +364,63 @@ class Administrator extends Controller
 
     }
 
+    //edit category
     public function edit(Request $request){
         // dd($request);
         $category = Category::with('subCategory')->find($request->id);
         // dd($category);
         return response()->json(['category'=>$category]);
     }
-
+    //update category and criteria
     public function update(Request $request){
-        // dd($request);
+        // dd($request->type);
         $category = Category::with(['subCategory','event'])->find($request->category_id);
+        
         $category->update(['category_name'=>$request->category_name]);
         foreach ($request->criteria as $k => $c) {
             // dd($k);
             $category->subCategory[$k]->update(['sub_category'=>$c,'percentage'=>$request->percentage[$k]]);
         }
 
-        return Redirect::route('admin.event.start', $category->event_id)->with(['updates' => "Category is updated successfully."]);
+        if($category->status){
+            switch ($request->type) {
+                case 'start':
+                    return Redirect::route('admin.event.start', $category->event_id)->with(['status' => "Category is on-going unabled to update."]);
+                    break;
+                case 'category':
+                    return Redirect::route('admin.category', $category->event_id)->with(['status' => "Category is on-going unabled to update."]);
+                    break;
+                
+                default:
+                    # code...
+                    break;
+            }
+        }else{
+            switch ($request->type) {
+                case 'start':
+                    return Redirect::route('admin.event.start', $category->event_id)->with(['updates' => "Category is updated successfully."]);
+                    break;
+                case 'category':
+                    return Redirect::route('admin.category', $category->event_id)->with(['status' => "Category is updated successfully."]);
+                    break;
+                
+                default:
+                    # code...
+                    break;
+            }
+        }
         
+        
+    }
+
+    //cancel active category
+    public function cancelEvent(Request $request){
+        // dd($request->id);
+        $category = Category::find($request->id);
+        if($category){
+            $category->update(['status'=>false]);
+        }
+        return Redirect::route('admin.event.start', $category->event_id)->with(['updates' => "Category is not active you can now edit it."]);
     }
 
     private function generateUniqueCode()

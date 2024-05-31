@@ -15,6 +15,7 @@
             </div>
             <form action="{{ route('admin.category.update') }}" method="post">
                 @csrf
+                <input type="text" name="type" id="type" class="hidden">
                 <input type="number" name="category_id" id="category_id" class="hidden">
                 <div>
                     <div class="flex flex-col shadow mb-2 p-2">

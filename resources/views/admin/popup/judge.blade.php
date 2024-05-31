@@ -11,7 +11,7 @@
         <div class="mt-4">
             <p class="text-red-500 mb-1">System Message</p>
             <p class="text-gray-700 bg-slate-50 p-2 mb-1">
-                <span class="text-slate-500 text-md">A new judge has been successfully added to the event.</span>
+                <span class="text-slate-500 text-md">{{ $message }}</span>
             </p>
             
         </div>

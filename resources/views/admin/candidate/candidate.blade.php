@@ -42,16 +42,19 @@
                                             <span class="font-bold uppercase text-blue-500">{{ $event->name }}</span>
                                             <p>{{ $event->details }}</p>
                                             <p class="text-blue-500">{{ $event->created_at->format('F j, Y') }}</p>
-                                        </div>
-                                        <div class="shadow col-span-3 p-2">
-                                            <span class="font-bold">Category</span>
-                                            @foreach ($event->category as $c)
-                                                <div class="flex items-center gap-2 p-1 bg-slate-100 capitalize">
-                                                    <i class="fa-solid fa-circle text-[8px] text-green-500"></i>
-                                                    <span>{{ $c->category_name }}</span>
+                                            <div class="p-2 shadow">
+                                                <p class="font-bold text-center">Category</p>
+                                                <div class="shadow flex flex-wrap gap-2">
+                                                    @foreach ($event->category as $c)
+                                                        <div class="flex items-center gap-2 p-1 bg-slate-50 shadow-1 capitalize">
+                                                            <i class="fa-solid fa-circle text-[8px] text-green-500"></i>
+                                                            <span>{{ $c->category_name }}</span>
+                                                        </div>
+                                                    @endforeach
                                                 </div>
-                                            @endforeach
+                                            </div>
                                         </div>
+                                        
 
 
                                     </div>
@@ -109,16 +112,19 @@
             </div>
         </div>
 
-        {{-- <div class="max-w-12xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-12xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="flex justify-between items-center px-6 p-2">
-                    <h1 class="text-sm md:text-xl lg:text-xl">Created Judge</h1>
-                    <button id="openCode" data-event_id="{{ $event->id }}" type="button" class="bg-slate-700 text-white px-1 rounded-sm hover:bg-slate-800"><i class="fa-solid fa-print"></i> code</button>
+                    <h1 class="text-sm md:text-xl lg:text-xl">Available Candidate's</h1>
+                    {{-- <button id="openCode" data-event_id="{{ $event->id }}" type="button" class="bg-slate-700 text-white px-1 rounded-sm hover:bg-slate-800"><i class="fa-solid fa-print"></i> code</button> --}}
                 </div>
                 <div>
                     <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
+                                <th scope="col" class="px-6 py-3">
+                                    ID
+                                </th>
                                 <th scope="col" class="px-6 py-3">
                                     Name
                                 </th>
@@ -135,28 +141,31 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($event->judge as $j)
+                            @foreach ($event->candidates as $c)
                                 <tr class="bg-white border-b border-slate-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-slate-100 dark:hover:bg-gray-600">
-                                    <td class="px-6 py-4 flex gap-1 items-center font-bold">
-                                        <i class="fa-solid fa-circle text-[8px] text-green-500"></i>
-                                        {{ $j->name }}
+                                    <td class="px-6 py-4">
+                                        {{ $c->id }}
+                                    </td>
+                                    <th scope="row"
+                                            class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                                            <img class="w-10 h-10 rounded-sm"
+                                                src="{{ asset('storage').'/'.$c->profile }}" alt="Jese image">
+                                            <div class="ps-3">
+                                                <div class="text-base font-semibold">{{ $c->name }}</div>
+                                            </div>
+                                        </th>
+                                    <td class="px-6 py-4">
+                                        {{ $c->age }}
                                     </td>
                                     <td class="px-6 py-4">
-                                        {{ $j->address }}
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        {{ $j->position }}
-                                    </td>
-                                    <td class="px-6 py-4 flex items-center gap-1 text-green-500 font-bold">
-                                        <i class="fa-solid fa-circle text-[8px]"></i>
-                                        {{ $j->code }}
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        {{ $j->created_at }}
+                                        {{ $c->created_at }}
                                     </td>
                                     <td class="px-6 py-4 text-blue-500">
-                                        <a href="#">
+                                        <a href="#" data-candidate_id="{{ $c->id }}" class="editCandidate">
                                             <i class="fa-solid fa-pen-to-square text-xl hover:text-blue-700"></i>
+                                        </a>
+                                        <a href="{{ route('admin.candidate.destroy', $c->id) }}">
+                                            <i class="fa-solid fa-square-minus text-xl text-red-500 hover:text-red-700"></i>
                                         </a>
                                     </td>
                                 </tr>
@@ -165,21 +174,64 @@
                     </table>
                 </div>
             </div>
-        </div> --}}
+        </div>
 
         @if (session('candidate-status'))
-            @include('admin.popup.candidate')
+            @include('admin.popup.candidate',['message'=>session('message')])
         @endif
         
+        @include('admin.candidate.edit')
     </div>
 
     @section('scripts')
         <script>
             $(document).ready(function() {
+                let candidates = @json($event->candidates);
+                console.log(candidates)
                 $('#candidateCloseBtn').click(function(){
                     // alert('dwadwad')
                     $('#candidateBackdrop').addClass('hidden')
                     $('#candidateModal').addClass('hidden')
+                })
+
+                $('.editCandidate').click(function(){
+                    // alert($(this).data('candidate_id'))
+                    let candidateId = $(this).data('candidate_id');
+                    let renderCandidate = ''
+                    candidates.forEach(c=>{
+                        if(c.id === candidateId){
+                            console.log(c)
+                            renderJudge = `
+                            <input type="number" name="candidate_id" id="candidate_id" value="${c.id}" class="hidden">
+                            <div class="flex flex-col shadow mb-2 p-2">
+                                <label for="">Profile:</label>
+                                <div class="flex gap-2 items-center">
+                                    <img class="w-30 h-30 rounded-md" src="{{ asset('storage') }}/${c.profile}" alt="profile">
+                                    <input type="file" id="candidate_profile" name="candidate_profile" value="" class="rounded-md flex-1">
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-2 shadow mb-2 p-2">
+                                <div class="grid grid-cols-2 gap-2 items-center shadow mb-2 p-2">
+                                    <div class="">
+                                        <label for="">Name:</label>
+                                        <input type="text" name="name" value="${c.name}" class="rounded-md w-full">
+                                    </div>
+                                    
+                                    <div class="">
+                                        <label for="">Position:</label>
+                                        <input type="number" name="age" value="${c.age}" class="rounded-md w-full">
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            `
+                            $('#renderEditCandidateContainer').html(renderJudge)
+
+                            $('#editCandidateBackdrop').removeClass('hidden')
+                            $('#editCandidateModal').removeClass('hidden')
+                        }
+                    })
+                    
                 })
             })
         </script>

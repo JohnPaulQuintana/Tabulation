@@ -113,7 +113,7 @@
                                                         <label for="">Category Name</label>
                                                         <div class="flex items-center gap-2">
 
-                                                            <i data-categoryId="{{ $c->id }}"
+                                                            <i data-category_id="{{ $c->id }}"
                                                                 class="edit_category fa-sharp fa-solid fa-pen-to-square text-[22px] text-green-500 hover:cursor-pointer hover:text-green-700"></i>
                                                             <i
                                                                 class="fa-solid fa-square-xmark text-2xl text-red-500 hover:text-red-700 hover:cursor-pointer"></i>
@@ -171,15 +171,69 @@
         </div>
     </div>
 
+    @include('admin.category.edit')
+
+    @if (session('status'))
+        @include('admin.popup.status', ['status'=>session('status')]);
+    @endif
     @section('scripts')
         <script>
             $(document).ready(function() {
                 let status = @json(session('save_category'));
-                console.log(status)
+                let categories = @json($categories);
+                console.log(categories)
                 if (status !== null) {
                     successMessage()
                 }
+
+                $(".edit_category").click(function(){
+                    // alert($(this).data('category_id'))
+                    renderCriteria($(this).data('category_id'),categories)
+                    $('#editBackdrop').removeClass('hidden')
+                    $('#editModal').removeClass('hidden')
+                })
+
+                $('#editCloseBtn').click(function(){
+                    $('#editBackdrop').addClass('hidden')
+                    $('#editModal').addClass('hidden')
+                })
+                $('#statusCloseBtn').click(function(){
+                    $('#statusBackdrop').addClass('hidden')
+                    $('#statusModal').addClass('hidden')
+                })
             })
+
+            // render criterria
+            const renderCriteria = (id,category) => {
+                let renderCriteria = ''
+                category.forEach(c => {
+                    if(id === c.id){
+                        // console.log(c)
+                        $('#type').val('category')
+                        $('#category_name').val(c.category_name)
+                        $('#category_id').val(id)
+                        c.sub_category.forEach(sc => {
+                            console.log(sc)
+                            renderCriteria += `
+                                <div class="flex gap-2 justify-between items-center shadow mb-2 p-2">
+                                    <div class="">
+                                        <label for="">Criteria:</label>
+                                        <input type="text" name="criteria[]" value="${sc.sub_category}" class="rounded-md w-full">
+                                    </div>
+                                    
+                                    <div class="">
+                                        <label for="">Percentage:</label>
+                                        <input type="number" name="percentage[]" value="${sc.percentage}" class="rounded-md w-full">
+                                    </div>
+                                </div>
+                            `
+                        })
+
+                        $('#renderEditCriteriaContainer').html(renderCriteria)
+                    }
+                    
+                });
+            }
 
             const successMessage = () => {
                 Swal.fire({
@@ -188,6 +242,7 @@
                     icon: "success"
                 });
             }
+
         </script>
     @endsection
 </x-app-layout>

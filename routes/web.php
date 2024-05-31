@@ -35,11 +35,15 @@ Route::group(['middleware' => ['auth','verified']], function () {
         Route::post('/category/store', [Administrator::class, 'categoryStore'])->name('category.store');
         Route::get('/judge/{id}', [Administrator::class, 'judge'])->name('judge');
         Route::post('/judge/store', [Administrator::class, 'judgeStore'])->name('judge.store');
+        Route::post('/judge/update', [Administrator::class, 'judgeUpdate'])->name('judge.update');
         Route::post('/judge/code', [Administrator::class, 'judgeCode'])->name('judge.code');
         Route::get('/candidate/{id}', [Administrator::class, 'candidate'])->name('candidate');
         Route::post('/candidate/store', [Administrator::class, 'candidateStore'])->name('candidate.store');
+        Route::post('/candidate/update', [Administrator::class, 'candidateUpdate'])->name('candidate.update');
+        Route::get('/candidate/destroy/{id}', [Administrator::class, 'candidateDestroy'])->name('candidate.destroy');
         // start the event
         Route::get('/start/{id}', [Administrator::class, 'startEvent'])->name('event.start');
+        Route::get('/start/cancel/{id}', [Administrator::class, 'cancelEvent'])->name('event.cancel');
         Route::post('/set-status', [Administrator::class, 'updateStatus'])->name('event.setStatus');
         Route::get('/start-voting/{id}', [Administrator::class, 'startVoting'])->name('event.start.voting');
         Route::get('/edit', [Administrator::class, 'edit'])->name('category.edit');

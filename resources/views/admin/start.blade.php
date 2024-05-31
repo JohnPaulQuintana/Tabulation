@@ -184,13 +184,14 @@
                                             </div>
                                         @endforeach
 
-                                        <div class="py-2 mx-auto flex items-center">
+                                        <div class="py-2 mx-auto flex flex-col gap-2 items-center">
                                             @switch($category->status)
                                                 @case(false)
                                                     <a href="{{ route('admin.event.start.voting', $category->id) }}" class="rounded-md bg-blue-500 w-full text-white text-center hover:bg-blue-700 p-1">activate</a>
                                                     @break
                                                 @case(true)
                                                     <a href="#" class="rounded-md bg-slate-100 w-full text-yellow-400 text-center p-1">in-progress...</a>
+                                                    <a href="{{ route('admin.event.cancel', $category->id) }}" class="rounded-md bg-red-500 w-full text-white text-center p-1 hover:bg-red-700">Cancel</a>
                                                     @break
                                                 {{-- @case("3")
                                                     <a href="#" class="rounded-md bg-slate-100 w-full text-yellow-400 text-center hover:bg-blue-700 p-1">in-progress...</a>
@@ -255,6 +256,7 @@
                                     </div>
                                     `
                                 });
+                                $('#type').val('start')
                                 $('#category_id').val(res.category.id)
                                 $('#category_name').val(res.category.category_name)
                                 $('#renderEditCriteriaContainer').html(renderCriteria)

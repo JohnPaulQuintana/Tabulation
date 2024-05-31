@@ -218,7 +218,7 @@
                                     </div>
                                     
                                     <div class="">
-                                        <label for="">Position:</label>
+                                        <label for="">Age:</label>
                                         <input type="number" name="age" value="${c.age}" class="rounded-md w-full">
                                     </div>
                                     

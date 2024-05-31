@@ -167,7 +167,7 @@
                 .then(function(res){
                     // console.log()
                     let data = JSON.parse(res.vote.criteria)
-                    // console.log(data)
+                    // console.log(res)
                     let renderCriteria = ''
                     for (const key in data) {
                         if (data.hasOwnProperty(key)) {

@@ -3,7 +3,7 @@
         <i class="fa-duotone fa-calendar-check"></i>
     </div>
     <div class="text-center text-md">
-        <span class="block font-bold text-5xl">0{{ $count }}</span>
+        <span class="block font-bold text-5xl">0{{ $eventCount }}</span>
         <span>Total of Events</span>
     </div>
 </div>

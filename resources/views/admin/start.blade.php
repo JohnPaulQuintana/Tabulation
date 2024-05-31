@@ -85,7 +85,7 @@
 
                                 <div class="bg-slate-50 col-span-3 p-2">
                                     <h1 class="uppercase font-semibold">Candidates Leading in Votes</h1>
-                                    <div>
+                                    <div class="h-[200px] overflow-y-auto">
                                         <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 bg-white">
                                             <thead
                                                 class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">

@@ -20,8 +20,11 @@ class Administrator extends Controller
 {
     public function index()
     {
-        $events = Event::orderByDesc('created_at')->get();
-        return view('admin.index', compact('events'));
+        $events = Event::with('candidates')->orderByDesc('created_at')->get();
+        $candidates = Candidate::get();
+        $judges = Judge::get();
+        $categories = Category::get();
+        return view('admin.index', compact('events','candidates','judges','categories'));
     }
 
     public function event()

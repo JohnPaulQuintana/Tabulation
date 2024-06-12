@@ -17,16 +17,16 @@
                 <section class="bg-white dark:bg-gray-900 bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
                     <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 z-10 relative">
                         <span class="inline-flex justify-between items-center py-1 px-1 pe-4 mb-7">
-                            <span class="text-4xl font-extrabold tracking-tight leading-none text-gray-900 px-4 py-1.5 me-3 uppercase">Welcome to AMA Tabulation System</span> 
+                            <span class="text-5xl font-extrabold tracking-tight leading-none text-gray-900 px-4 py-1.5 me-3 uppercase">Welcome to AMA Tabulation System</span> 
                             
                         </span>
                         <div class="flex flex-col items-center justify-center mb-7 font-light">
                             <img class="w-30 h-30 rounded-sm" src="{{ asset('storage').'/'.Auth::user()->profile }}" alt="">
                             <span>{{ Auth::user()->name }}</span>
                         </div>
-                        <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">{{ $judgeWithEvent->event->name }}</h1>
+                        <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-4xl lg:text-4xl dark:text-white">{{ $judgeWithEvent->event->name }}</h1>
                         <p class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 lg:px-48 dark:text-gray-200">{{ $judgeWithEvent->event->details }}.</p>
-                        <a href="{{ route('judge.candidates') }}" class="bg-slate-700 p-2 text-white hover:bg-slate-800 text-xl">Start Voting</a>
+                        <a href="{{ route('judge.candidates') }}" class="bg-slate-700 p-4 rounded-md text-white hover:bg-slate-800 text-xl">Start</a>
                     </div>
                     <div class="bg-gradient-to-b from-blue-50 to-transparent dark:from-blue-900 w-full h-full absolute top-0 left-0 z-0"></div>
                 </section>

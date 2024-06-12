@@ -103,10 +103,11 @@
                                         </div>
                                         <div class="px-1">
                                             <label for="event_type">Sports Type</label>
-                                            <select type="text" name="event_type" class="block p-2 w-full rounded-md">
+                                            <select type="text" name="event_type" class="block p-2 w-full rounded-md hidden">
                                                 <option value="sport" {{ old('event_type') == 'sport' ? 'selected' : '' }}>Sports Events</option>
                                                 {{-- <option value="cultural" {{ old('event_type') == 'cultural' ? 'selected' : '' }}>Cultural Events</option> --}}
                                             </select>
+                                            <input type="text" class="block p-2 w-full rounded-md">
                                             @error('event_type')
                                                 <span class="text-red-500">Type of event is required.</span>
                                             @enderror

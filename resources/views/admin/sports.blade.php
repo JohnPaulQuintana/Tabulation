@@ -55,7 +55,8 @@
                                             </li>
                                             <li class="hover:bg-slate-100 p-4">
                                                 <a href="#" class="flex items-center px-2">
-                                                    <div class="h-2.5 w-2.5 rounded-full bg-red-500 me-2"></div> InActive
+                                                    <div class="h-2.5 w-2.5 rounded-full bg-red-500 me-2"></div>
+                                                    InActive
                                                     Sport's
                                                 </a>
                                             </li>
@@ -107,7 +108,7 @@
                                     <th scope="col" class="px-6 py-3">
                                         Judge
                                     </th>
-                                    
+
                                     <th scope="col" class="px-6 py-3">
                                         Status
                                     </th>
@@ -127,11 +128,11 @@
                                 @foreach ($events as $ev)
                                     <tr
                                         class="bg-white border-b border-slate-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-slate-100 dark:hover:bg-gray-600">
-                                        
+
                                         <th scope="row"
                                             class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
                                             <img class="w-10 h-10 rounded-sm"
-                                                src="{{ asset('storage').'/'.$ev->image }}" alt="Jese image">
+                                                src="{{ asset('storage') . '/' . $ev->image }}" alt="Jese image">
                                             <div class="ps-3">
                                                 <div class="text-base font-semibold">{{ $ev->name }}</div>
                                                 <div class="font-normal text-gray-500">Santiago City</div>
@@ -142,20 +143,23 @@
                                         </td>
                                         <td class="px-6 py-4">
                                             <i class="fa-solid fa-list"></i>
-                                            <a href="{{ route('admin.category', $ev->id) }}" class="font-bold text-blue-500 hover:cursor-pointer hover:text-blue-700">
-                                                0+
+                                            <a type="button" data-id="{{ $ev->id }}"
+                                                class="create-category font-bold text-blue-500 hover:cursor-pointer hover:text-blue-700">
+                                                {{ count($ev->sportsCategories) }}+
                                             </a>
                                         </td>
                                         <td class="px-6 py-4">
                                             <i class="fa-regular fa-user-group-simple"></i>
-                                            <a type="button" data-id="{{ $ev->id }}" class="create-teams font-bold text-blue-500 hover:cursor-pointer hover:text-blue-700">
+                                            <a type="button" data-id="{{ $ev->id }}"
+                                                class="create-teams font-bold text-blue-500 hover:cursor-pointer hover:text-blue-700">
                                                 {{ count($ev->teams) }}+
                                             </a>
                                         </td>
                                         <td class="px-6 py-4">
                                             <i class="fa-regular fa-user-group-simple"></i>
-                                            <a type="button" data-id="{{ $ev->id }}" class="font-bold text-blue-500 hover:cursor-pointer hover:text-blue-700">
-                                                0+
+                                            <a href="{{ route('admin.judge', $ev->id) }}" data-id="{{ $ev->id }}"
+                                                class="font-bold text-blue-500 hover:cursor-pointer hover:text-blue-700">
+                                                {{ count($ev->judge) }}+
                                             </a>
                                         </td>
                                         <td class="px-6 py-4">
@@ -163,10 +167,10 @@
                                                 @switch($ev->status)
                                                     @case(0)
                                                         <div class="h-2.5 w-2.5 rounded-full bg-red-500 me-2"></div> Offline
-                                                        @break
-                                                
+                                                    @break
+
                                                     @default
-                                                    <div class="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div> Online
+                                                        <div class="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div> Online
                                                 @endswitch
                                             </div>
                                         </td>
@@ -177,8 +181,10 @@
                                             <span>{{ \Carbon\Carbon::parse($ev->time)->format('h:i A') }}</span>
                                         </td>
                                         <td class="px-6 py-4">
-                                            <a href="{{ route('admin.event.edit', $ev->id) }}"><i class="fa-solid fa-pen-to-square text-xl text-red-500 hover:text-red-700"></i></a>
-                                            <a href="{{ route('admin.event.start', $ev->id) }}"><i class="fa-solid fa-circle-play text-xl text-blue-500 hover:text-blue-700"></i></a>
+                                            <a href="{{ route('admin.event.edit', $ev->id) }}"><i
+                                                    class="fa-solid fa-pen-to-square text-xl text-red-500 hover:text-red-700"></i></a>
+                                            <a href="{{ route('admin.sports.game', $ev->id) }}"><i
+                                                    class="fa-solid fa-circle-play text-xl text-blue-500 hover:text-blue-700"></i></a>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -196,41 +202,84 @@
         @include('admin.popup.success')
     @endif
 
+    @include('admin.sport.modal.edit')
+    @include('admin.sport.modal.category')
     @include('admin.sport.modal.team')
-   
+
     @section('scripts')
         <script>
             let teams = @json($events);
-            // console.log(teams)
-            $(document).ready(function(){
+            let validation = @json(session('validation'));
+            let modal = @json(session('modal'));
+            let modalEdit = @json(session('modal-edit'));
+            let eid = @json(session('event_id'));
+            let cid = @json(session('category_id'));
+            console.log(teams)
+            $(document).ready(function() {
 
+                if (validation && modal) {
+                    // alert("Category Name", 'This field is required!', 'error');
+                    filterCategory(teams, eid)
+                    $('#category_error').removeClass('hidden')
+                    $('#category_event_id').val(eid);
+                    $('#openModalCategory').trigger('click');
+
+                } else if (validation === false && modal === false) {
+                    alert("Category Saved", 'Category saved successfully!', 'success');
+                } else if (validation && modalEdit) {
+                    $('.backButton').addClass('hidden')
+                    $('#category_edit_error').removeClass('hidden')
+                    $('#category_event_id_edit').val(eid);
+                    $('#category_category_id_edit').val(cid);
+                    $('#openModalCategoryEdit').trigger('click');
+                }
                 // create teams
-                $('.create-teams').click(function(){
+                $('.create-teams').click(function() {
                     // alert($(this).data('id'))
                     let event_id = $(this).data('id');
 
                     //filter the events based on event id click
-                    filterEvents(teams,event_id);
+                    filterEvents(teams, event_id);
                     $('#sport_event_id').val(event_id);
                     $('#openModalTeams').trigger('click');
                 })
-                $('#modalCloseBtn').click(function(){
+                $('#modalCloseBtn').click(function() {
                     // alert('dwadwad')
                     $('#modalBackdrop').addClass('hidden')
                     $('#successModal').addClass('hidden')
                 })
 
-                const filterEvents = (teams,id)=>{
-                    let renderTeams = ''
-                    const routes = {};
-                    teams.forEach(team => {
-                        // console.log(team)
-                        if(team.id === id){
-                            // console.log(team.teams)
-                            team.teams.forEach(t => {
-                                routes[t.id] = "{{ route('admin.sports.team', ':id') }}".replace(':id', t.id);
-                                // console.log(routes[t.id])
-                                renderTeams += `
+                //end of create teams
+
+                //create category
+                $('.create-category').click(function() {
+                    // alert($(this).data('id'))
+                    let event_id = $(this).data('id');
+
+                    //filter the events based on event id click
+                    filterCategory(teams, event_id);
+                    $('#category_event_id').val(event_id);
+                    $('#openModalCategory').trigger('click');
+                })
+                //end create category
+
+
+
+
+
+            })
+
+            const filterEvents = (teams, id) => {
+                let renderTeams = ''
+                const routes = {};
+                teams.forEach(team => {
+                    // console.log(team)
+                    if (team.id === id) {
+                        // console.log(team.teams)
+                        team.teams.forEach(t => {
+                            routes[t.id] = "{{ route('admin.sports.team', ':id') }}".replace(':id', t.id);
+                            // console.log(routes[t.id])
+                            renderTeams += `
                                     <a class="group flex flex-col bg-white border shadow-sm rounded-xl hover:shadow-md transition dark:bg-neutral-900 dark:border-neutral-800" href="${routes[t.id]}">
                                         <div class="p-2 md:p-2">
                                             <div class="flex justify-between items-center">
@@ -249,13 +298,68 @@
                                         </div>
                                     </a>
                                 `
-                            });
+                        });
 
-                            $('#renderTeams').html(renderTeams)
-                        }
-                    });
-                }
+                        $('#renderTeams').html(renderTeams)
+                    }
+                });
+            }
+
+            const filterCategory = (events, id) => {
+                let categories = '';
+                events.forEach(e => {
+
+                    if (e.id === id) {
+                        console.log(e)
+                        e.sports_categories.forEach(c => {
+                            categories += `
+                                    <a data-event_id="${id}" data-id="${c.id}" data-category="${c.category}" class="category_edit group flex flex-col bg-white border shadow-sm rounded-md hover:shadow-md transition hover:cursor-pointer">
+                                        <div class="p-2 md:p-2">
+                                            <div class="flex justify-between items-center">
+                                            <div class="flex items-center">
+                                                <i class="fa-solid fa-layer-group text-xl"></i>
+                                                <div class="ms-3">
+                                                <h4 class="group-hover:text-blue-600 text-sm font-semibold text-gray-800 dark:group-hover:text-neutral-400 dark:text-neutral-200">
+                                                    ${c.category}
+                                                </h4>
+                                                </div>
+                                            </div>
+                                                <div class="ps-3">
+                                                    <svg class="flex-shrink-0 size-5 text-gray-800 dark:text-neutral-200" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                `
+                        });
+
+                        $('#renderCategories').html(categories)
+                    }
+                });
+
+                $('.category_edit').click(function() {
+                    let event_id = $(this).data('event_id')
+                    let category_id = $(this).data('id')
+                    let category = $(this).data('category')
+                    $('#category_event_id_edit').val(event_id);
+                    $('#category_category_id_edit').val(category_id);
+                    $('#category_edit').val(category);
+                    $('#openModalCategoryEdit').trigger('click');
+                })
+
+
+            }
+            $('.closeModalCategoryEdit').click(function() {
+                window.location.reload()
             })
+
+            const alert = (t, m, i) => {
+                Swal.fire({
+                    title: t,
+                    text: m,
+                    icon: i
+                });
+            }
         </script>
     @endsection
 </x-app-layout>

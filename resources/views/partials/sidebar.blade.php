@@ -77,7 +77,7 @@
                                         fill="" />
                                 </svg>
 
-                                Events
+                                Cultural Events
 
 
                             </a>

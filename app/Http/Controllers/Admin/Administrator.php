@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Event;
 use App\Models\Judge;
 use App\Models\Player;
+use App\Models\SportCategory;
 use App\Models\SubCategory;
 use App\Models\Team;
 use App\Models\User;
@@ -438,7 +439,7 @@ class Administrator extends Controller
     // sports
     public function sports()
     {
-        $events = Event::with(['teams'])->where('type', '=', 'sport')->orderByDesc('created_at')->get();
+        $events = Event::with(['teams', 'sportsCategories','judge'])->where('type', '=', 'sport')->orderByDesc('created_at')->get();
         // dd($events);
         return view('admin.sports', compact('events'));
         // return view('admin.sports');
@@ -563,6 +564,52 @@ class Administrator extends Controller
         Player::create(['team_id'=>$validated['team_id'], 'name'=>$validated['player_name'], 'profile'=>$path]);
 
         return Redirect::route('admin.sports.team', $request->team_id)->with(['success'=>'success', 'message'=>"Player successfully added!"]);
+    }
+
+    // category
+    public function sportCategoryStore(Request $request){
+        // dd($request);
+        $validated = $request->validate([
+            'event_id' => 'required|exists:events,id',
+            // 'category' => 'required|string|max:255',
+        ]);
+        
+        if(empty($request->category)){
+            return Redirect::route('admin.sports')->with(['validation'=>true,'modal'=>true, 'event_id'=>$validated['event_id']]);
+        }
+
+        SportCategory::create([
+            'event_id'=>$validated['event_id'],
+            'category'=>$request->category,
+        ]);
+
+        return Redirect::route('admin.sports')->with(['validation'=>false,'modal'=>false, 'event_id'=>$validated['event_id']]);
+    }
+
+    //category edit
+    public function sportCategoryUpdate(Request $request){
+        // dd($request);
+        $validated = $request->validate([
+            'category_id' => 'required|exists:sport_categories,id',
+            'event_id' => 'required|exists:events,id',
+            // 'category' => 'required|string|max:255',
+        ]);
+
+        if(empty($request->category)){
+            return Redirect::route('admin.sports')->with(['validation'=>true,'modal-edit'=>true, 'category_id'=>$validated['category_id'], 'event_id'=>$validated['event_id']]);
+        }
+
+        SportCategory::find($validated['category_id'])->update(['category'=>$request->category]);
+        return Redirect::route('admin.sports')->with(['validation'=>false,'modal'=>false, 'event_id'=>$validated['event_id']]);
+    }
+
+    //game start
+    public function game(Request $request){
+        // dd($request->id);
+        $sport = Event::with(['judge','teams','sportsCategories'])->find($request->id);
+        // dd($sport);
+        return view('admin.game', compact('sport'));
+
     }
 
     private function generateUniqueCode()

@@ -6,6 +6,7 @@ use App\Models\Candidate;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\Judge;
+use App\Models\PercentageScore;
 use App\Models\Vote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,10 +34,10 @@ class JudgeController extends Controller
             })
             ->first();
 
-        $eventCategory = Category::with('subCategory')
+        $eventCategory = Category::with(['subCategory', 'event.judge'])
             ->where('status', true)
             ->first();
-
+            // dd($eventCategory);
         if ($eventCategory) {
             $categoryId = $eventCategory->id;
             $judgeId = Auth::user()->id;
@@ -61,20 +62,40 @@ class JudgeController extends Controller
     //vote
     public function vote(Request $request)
     {
+        // dd($request);
         $criteriaVotes = [];
-        $activeCategory = Category::with('subCategory')->where('status',true)->first();
-       
+        $activeCategory = Category::with(['subCategory','event.judge'])->where('status',true)->first();
+        $N = count($activeCategory->event->judge);//total judges
+        $mpts = $N*100;
+        $totalScore = 0;
+        // $totalSubPercentage = 0;
         foreach ($activeCategory->subCategory as $key => $criteria) {
             // dd($criteria->sub_category);
-            $criteriaVotes[$criteria->sub_category] = intval($request->criteria[$key]);
+            $criteriaVotes[$criteria->sub_category] = floatval($request->criteria[$key]);
+            //total percentage for all this category
+            // $totalSubPercentage += $criteria->percentage;
+            $totalScore += floatval($request->criteria[$key]);
+           
         }
-        // dd($request->criteria);
-        Vote::create([
-            'candidate_id' => $request->candidate_id,
-            'judge_id' => Auth::user()->id,
-            'category_id' => $request->category_id,
-            'criteria' => json_encode($criteriaVotes)
-        ]);
+        // dd($totalScore);
+        $percentage = round(($totalScore / $mpts) * 100, 1);//by default its set to 100%
+        // dd($percentage);
+        $vote = Vote::create([
+                'candidate_id' => $request->candidate_id,
+                'judge_id' => Auth::user()->id,
+                'category_id' => $request->category_id,
+                'criteria' => json_encode($criteriaVotes)
+            ]);
+            // dd($vote);
+        if($vote){
+            PercentageScore::create([
+                'vote_id' => $vote->id,
+                'candidate_id' => $request->candidate_id,
+                'judge_id' => Auth::user()->id,
+                'category_id' => $request->category_id,
+                'total_score' => $percentage
+            ]);
+        }
 
         return Redirect::route('judge.candidates')->with(['status' => true, 'message' => 'Successfully recorded your votes!']);
     }
@@ -82,7 +103,7 @@ class JudgeController extends Controller
     //edit
     public function edit(Request $request){
         // dd($request->id);
-        $vote = Vote::find($request->id);
+        $vote = Vote::with(['percentages'])->where('id',$request->id)->first();
         // dd($vote);
         return response()->json(['vote'=>$vote]);
     }
@@ -90,13 +111,24 @@ class JudgeController extends Controller
     public function update(Request $request){
         // dd($request);
         $criteriaVotes = [];
-        $activeCategory = Category::with('subCategory')->where('status',true)->first();
-       
+        // $activeCategory = Category::with('subCategory')->where('status',true)->first();
+        $activeCategory = Category::with(['subCategory','event.judge'])->where('status',true)->first();
+        $N = count($activeCategory->event->judge);//total judges
+        $mpts = $N*100;
+        $totalScore = 0;
         foreach ($activeCategory->subCategory as $key => $criteria) {
-            $criteriaVotes[$criteria->sub_category] = intval($request->criteria[$key]);
+            $criteriaVotes[$criteria->sub_category] = floatval($request->criteria[$key]);
+            $totalScore += floatval($request->criteria[$key]);
         }
 
+        $percentage = round(($totalScore / $mpts) * 100, 1);//by default its set to 100%
         $updateVote = Vote::find($request->vote_id)->update(['criteria'=>json_encode($criteriaVotes)]);
+       
+        if($updateVote){
+            $updatePercentage = PercentageScore::where('vote_id',$request->vote_id);
+            // dd($updatePercentage);
+            $updatePercentage->update(['total_score'=>$percentage]);
+        }
         return Redirect::route('judge.candidates')->with(['status' => true, 'message' => 'Successfully recorded your votes!']);
     }
 }

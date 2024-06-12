@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Candidate;
 use App\Models\Category;
 use App\Models\Judge;
+use App\Models\Team;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -25,5 +26,10 @@ class Event extends Model
 
     public function candidates() :HasMany{
         return $this->hasMany(Candidate::class);
+    }
+
+    //for sports
+    public function teams() :HasMany{
+        return $this->hasMany(Team::class);
     }
 }

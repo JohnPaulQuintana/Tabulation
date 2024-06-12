@@ -98,11 +98,11 @@
                                                     <th scope="col" class="px-6 py-3">
                                                         Name
                                                     </th>
-                                                    <th scope="col" class="px-6 py-3">
+                                                    {{-- <th scope="col" class="px-6 py-3">
                                                         Category
-                                                    </th>
+                                                    </th> --}}
                                                     <th scope="col" class="px-6 py-3">
-                                                        Total Votes (%)
+                                                        Overall Votes (%)
                                                     </th>
                                                     <th scope="col" class="px-6 py-3">
                                                         Percentage
@@ -133,11 +133,11 @@
                                                                 <div class="font-normal text-gray-500">Santiago City</div>
                                                             </div>
                                                         </td>
-                                                        <td class="p-4">
+                                                        {{-- <td class="p-4">
                                                             <div class="flex items-center">
                                                                 {{ $activeCategory->category_name }}
                                                             </div>
-                                                        </td>
+                                                        </td> --}}
                                                         <td class="p-4">
                                                             <div class="flex items-center">
                                                                 {{ $candidate->vote_results['total'] }}%

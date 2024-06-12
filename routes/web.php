@@ -48,6 +48,15 @@ Route::group(['middleware' => ['auth','verified']], function () {
         Route::get('/start-voting/{id}', [Administrator::class, 'startVoting'])->name('event.start.voting');
         Route::get('/edit', [Administrator::class, 'edit'])->name('category.edit');
         Route::post('/update', [Administrator::class, 'update'])->name('category.update');
+
+        // sports
+        Route::get('/sports', [Administrator::class, 'sports'])->name('sports');
+        Route::get('/sports/create', [Administrator::class, 'createSports'])->name('sports.create');
+        Route::post('/sports/store', [Administrator::class, 'storeSports'])->name('sports.store');
+        Route::post('/sports/store/team', [Administrator::class, 'storeTeam'])->name('sports.store.team');
+        Route::get('/sports/team/{id}', [Administrator::class, 'team'])->name('sports.team');
+        Route::post('/sports/update/team', [Administrator::class, 'updateTeam'])->name('sports.update.team');
+        Route::post('/sports/store/player', [Administrator::class, 'storePlayer'])->name('sports.store.player');
     });
 
     // judge

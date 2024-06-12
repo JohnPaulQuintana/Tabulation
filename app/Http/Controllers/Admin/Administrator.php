@@ -7,7 +7,9 @@ use App\Models\Candidate;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\Judge;
+use App\Models\Player;
 use App\Models\SubCategory;
+use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -24,12 +26,12 @@ class Administrator extends Controller
         $candidates = Candidate::get();
         $judges = Judge::get();
         $categories = Category::get();
-        return view('admin.index', compact('events','candidates','judges','categories'));
+        return view('admin.index', compact('events', 'candidates', 'judges', 'categories'));
     }
 
     public function event()
     {
-        $events = Event::with(['category', 'category.subCategory', 'judge', 'candidates'])->where('type', '!=', 'System Message')->orderByDesc('created_at')->get();
+        $events = Event::with(['category', 'category.subCategory', 'judge', 'candidates'])->where('type', '=', 'cultural')->orderByDesc('created_at')->get();
         // dd($events);
         return view('admin.event', compact('events'));
     }
@@ -215,20 +217,21 @@ class Administrator extends Controller
         }
 
 
-        return Redirect::route('admin.judge', $request->event_id)->with(['judge-save' => 'success', 'message'=>'A new judge has been successfully added to the event.']);
+        return Redirect::route('admin.judge', $request->event_id)->with(['judge-save' => 'success', 'message' => 'A new judge has been successfully added to the event.']);
     }
 
     //judge update
-    public function judgeUpdate(Request $request){
+    public function judgeUpdate(Request $request)
+    {
         // dd($request);
         $judge = Judge::with('event')->find($request->judge_id);
-        if($request->hasFile('judge_profile')){
+        if ($request->hasFile('judge_profile')) {
             $path = $request->file('judge_profile')->store('judge', 'public');
-            $judge->update(['profile'=>$path]);  
+            $judge->update(['profile' => $path]);
         }
 
-        $judge->update(['name'=>$request->name,'address'=>$request->address,'position'=>$request->position]);
-        return Redirect::route('admin.judge', $judge->event->id)->with(['judge-save' => 'success', 'message'=>'Judge '.$judge->name.' has been updated successfully.']);
+        $judge->update(['name' => $request->name, 'address' => $request->address, 'position' => $request->position]);
+        return Redirect::route('admin.judge', $judge->event->id)->with(['judge-save' => 'success', 'message' => 'Judge ' . $judge->name . ' has been updated successfully.']);
     }
     //jugde code
     public function judgeCode(Request $request)
@@ -243,7 +246,7 @@ class Administrator extends Controller
     public function candidate(Request $request)
     {
         $event_id = $request->id;
-        $event = Event::with(['category', 'judge','candidates'])->find($event_id);
+        $event = Event::with(['category', 'judge', 'candidates'])->find($event_id);
         // dd($event);
         return view('admin.candidate.candidate', compact('event'));
     }
@@ -270,53 +273,58 @@ class Administrator extends Controller
             ]);
 
 
-            return Redirect::route('admin.candidate', $request->event_id)->with(['candidate-status'=>'success', 'message'=>'A new candidate has been successfully added to the event.']);
+            return Redirect::route('admin.candidate', $request->event_id)->with(['candidate-status' => 'success', 'message' => 'A new candidate has been successfully added to the event.']);
         }
     }
 
     //candidate update
-    public function candidateUpdate(Request $request){
+    public function candidateUpdate(Request $request)
+    {
         // dd($request);
         $candidate = Candidate::with('event')->find($request->candidate_id);
-        if($request->hasFile('candidate_profile')){
+        if ($request->hasFile('candidate_profile')) {
             $path = $request->file('candidate_profile')->store('profile', 'public');
-            $candidate->update(['profile'=>$path]);  
+            $candidate->update(['profile' => $path]);
         }
 
-        $candidate->update(['name'=>$request->name,'age'=>$request->age]);
-        return Redirect::route('admin.candidate', $candidate->event->id)->with(['candidate-status'=>'success', 'message'=>'Candidate '.$candidate->name.' is successfully updated!']);
+        $candidate->update(['name' => $request->name, 'age' => $request->age]);
+        return Redirect::route('admin.candidate', $candidate->event->id)->with(['candidate-status' => 'success', 'message' => 'Candidate ' . $candidate->name . ' is successfully updated!']);
     }
 
     //cadidate destory
-    public function candidateDestroy(Request $request){
+    public function candidateDestroy(Request $request)
+    {
         // dd($request->id);
         $candidate = Candidate::with('event')->find($request->id);
 
-        if($candidate){
+        if ($candidate) {
             $candidate->delete();
         }
 
-        return Redirect::route('admin.candidate', $candidate->event->id)->with(['candidate-status'=>'success', 'message'=>'Candidate '.$candidate->name.' is successfully deleted!']);
+        return Redirect::route('admin.candidate', $candidate->event->id)->with(['candidate-status' => 'success', 'message' => 'Candidate ' . $candidate->name . ' is successfully deleted!']);
     }
     //start the event
     public function startEvent(Request $request)
     {
-       
+
         $activeCategory = Category::with('subCategory')->where('status', true)->first();
-        if(!$activeCategory){
+        if (!$activeCategory) {
             $activeCategory = Category::with('subCategory')->where('status', false)->first();
         }
-        // dd($activeCategory);
+
         $activeEvents = Event::with([
-            'candidates.votes'=>function($q) use ($activeCategory){
+            'candidates.votes' => function ($q) use ($activeCategory) {
                 $q->where('category_id', $activeCategory->id);
-            }
-            ,'judge', 'category.subCategory'])->find($request->id);
-        // dd($activeCategory);
-        // dd();
+            }, 'judge', 'category.subCategory', 'candidates.percentageScores'
+        ])->find($request->id);
+        //    dd($activeEvents);
         // Iterate over each candidate
         foreach ($activeEvents->candidates as $candidate) {
-            $votePerCandidates = $this->calculateTotalPerCriteria($candidate, $activeCategory->subCategory);
+            // per criteria
+            // $votePerCandidates = $this->calculateTotalPerCriteria($candidate, $activeCategory->subCategory);
+            //total
+
+            $votePerCandidates = $this->calculateTotalPercentage($candidate, $activeCategory->subCategory);
             // dd($votePerCandidates);
             $candidate->vote_results = $votePerCandidates;
         }
@@ -356,7 +364,7 @@ class Administrator extends Controller
         $activeCategory = Category::where('status', true)->first();
 
         if ($activeCategory) {
-            $activeCategory->update(['status'=>false]);
+            $activeCategory->update(['status' => false]);
             // If there is an active category, return with an error message
             // return Redirect::route('admin.event.start', $category->event_id)->with(['status' => "There is already an active category ongoing. Cannot activate."]);
         }
@@ -368,24 +376,26 @@ class Administrator extends Controller
     }
 
     //edit category
-    public function edit(Request $request){
+    public function edit(Request $request)
+    {
         // dd($request);
         $category = Category::with('subCategory')->find($request->id);
         // dd($category);
-        return response()->json(['category'=>$category]);
+        return response()->json(['category' => $category]);
     }
     //update category and criteria
-    public function update(Request $request){
+    public function update(Request $request)
+    {
         // dd($request->type);
-        $category = Category::with(['subCategory','event'])->find($request->category_id);
-        
-        $category->update(['category_name'=>$request->category_name]);
+        $category = Category::with(['subCategory', 'event'])->find($request->category_id);
+
+        $category->update(['category_name' => $request->category_name]);
         foreach ($request->criteria as $k => $c) {
             // dd($k);
-            $category->subCategory[$k]->update(['sub_category'=>$c,'percentage'=>$request->percentage[$k]]);
+            $category->subCategory[$k]->update(['sub_category' => $c, 'percentage' => $request->percentage[$k]]);
         }
 
-        if($category->status){
+        if ($category->status) {
             switch ($request->type) {
                 case 'start':
                     return Redirect::route('admin.event.start', $category->event_id)->with(['status' => "Category is on-going unabled to update."]);
@@ -393,12 +403,12 @@ class Administrator extends Controller
                 case 'category':
                     return Redirect::route('admin.category', $category->event_id)->with(['status' => "Category is on-going unabled to update."]);
                     break;
-                
+
                 default:
                     # code...
                     break;
             }
-        }else{
+        } else {
             switch ($request->type) {
                 case 'start':
                     return Redirect::route('admin.event.start', $category->event_id)->with(['updates' => "Category is updated successfully."]);
@@ -406,24 +416,153 @@ class Administrator extends Controller
                 case 'category':
                     return Redirect::route('admin.category', $category->event_id)->with(['status' => "Category is updated successfully."]);
                     break;
-                
+
                 default:
                     # code...
                     break;
             }
         }
-        
-        
     }
 
     //cancel active category
-    public function cancelEvent(Request $request){
+    public function cancelEvent(Request $request)
+    {
         // dd($request->id);
         $category = Category::find($request->id);
-        if($category){
-            $category->update(['status'=>false]);
+        if ($category) {
+            $category->update(['status' => false]);
         }
         return Redirect::route('admin.event.start', $category->event_id)->with(['updates' => "Category is not active you can now edit it."]);
+    }
+
+    // sports
+    public function sports()
+    {
+        $events = Event::with(['teams'])->where('type', '=', 'sport')->orderByDesc('created_at')->get();
+        // dd($events);
+        return view('admin.sports', compact('events'));
+        // return view('admin.sports');
+    }
+
+    //sports create
+    public function createSports(){
+        return view('admin.sport.create');
+    }
+
+    //sports store
+    public function storeSports(Request $request){
+        $validated = $request->validate([
+            'event_name' => 'required',
+            'event_address' => 'required',
+            'event_details' => 'required',
+            'event_time' => 'required',
+            'event_date' => 'required',
+            'event_type' => 'required',
+            'event_image' => 'required|image',  // Ensure it's an image
+            // 'categories' => 'required|array|min:1',
+            // 'sub_categories' => 'required|array',
+            // 'sub_percentage' => 'required|array',
+        ]);
+
+        if ($request->hasFile('event_image')) {
+            // Store the uploaded file and update the user's profile picture
+            $path = $request->file('event_image')->store('images', 'public');
+
+            $event = Event::create([
+                'name' => $validated['event_name'],
+                'address' => $validated['event_address'],
+                'details' => $validated['event_details'],
+                'date' => $validated['event_date'],
+                'time' => $validated['event_time'],
+                'type' => $validated['event_type'],
+                'image' => $path,
+            ]);
+
+
+            return Redirect::route('admin.sports')->with('status', 'success');
+        }
+    }
+
+    //sports store teams
+    public function storeTeam(Request $request){
+        // dd($request);
+        $validated = $request->validate([
+            'team_name' => 'required',
+            'team_profile' => 'required|image',  // Ensure it's an image,
+        ]);
+
+        if ($request->hasFile('team_profile')) {
+            // Store the uploaded file and update the user's profile picture
+            $path = $request->file('team_profile')->store('team_profile', 'public');
+
+            Team::create([
+                'event_id' => $request->event_id,
+                'team_name' => $validated['team_name'],
+                'profile' => $path,
+            ]);
+
+
+            return Redirect::route('admin.sports', $request->event_id)->with(['candidate-status' => 'success', 'message' => 'A new candidate has been successfully added to the event.']);
+        }
+    }
+
+    //view teams
+    public function team(Request $request){
+        // dd($request->id);
+        $team = Team::with('players')->find($request->id);
+        // dd($team);
+        return view('admin.sport.team', compact('team'));
+    }
+
+    //update teams profile
+    public function updateTeam(Request $request){
+        // dd($request);
+        $validated = $request->validate([
+            'team_id' => 'required|exists:teams,id',
+            'team_name' => 'required|string|max:255',
+            'team_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+        // Find the team by ID
+        $team = Team::find($request->team_id);
+
+         // Check if team_image file is present
+        if ($request->hasFile('team_image')) {
+            // Store the file and get the path
+            $path = $request->file('team_image')->store('team_profile', 'public');
+
+            // Update the team record with the image path
+            $team->update([
+                'team_name' => $validated['team_name'],
+                'profile' => $path,
+            ]);
+        } else {
+            // Update only the team name if image is not present
+            $team->update([
+                'team_name' => $validated['team_name'],
+            ]);
+        }
+
+        return Redirect::route('admin.sports.team', $request->team_id)->with(['success'=>'success', 'message'=>'Team profile successfully updated!']);
+    }
+
+    //store player
+    public function storePlayer(Request $request){
+        // dd($request);
+
+        $validated = $request->validate([
+            'team_id' => 'required|exists:teams,id',
+            'player_name' => 'required|string|max:255',
+            'player_profile' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if($request->hasFile('player_profile')){
+            // Store the file and get the path
+            $path = $request->file('player_profile')->store('player_profile', 'public');
+        }
+
+        Player::create(['team_id'=>$validated['team_id'], 'name'=>$validated['player_name'], 'profile'=>$path]);
+
+        return Redirect::route('admin.sports.team', $request->team_id)->with(['success'=>'success', 'message'=>"Player successfully added!"]);
     }
 
     private function generateUniqueCode()
@@ -453,5 +592,20 @@ class Administrator extends Controller
         $candidateVotesPerCriteria['total'] = (array_sum($candidateVotesPerCriteria));
 
         return $candidateVotesPerCriteria;
+    }
+
+    private function calculateTotalPercentage($candidate, $subCategories)
+    {
+        $totalCategory = count($subCategories);
+        $candidateOverAllVotes = []; // Initialize here to reset for each candidate
+        $overAllScore = 0;
+        foreach ($candidate->percentageScores as $vote) {
+            $overAllScore += $vote->total_score;
+        }
+        // Calculate the overall percentage
+        $overallPercentage = $overAllScore / $totalCategory;
+        // dd($overallPercentage);
+        $candidateOverAllVotes['total'] = $overallPercentage;
+        return $candidateOverAllVotes;
     }
 }

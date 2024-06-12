@@ -84,9 +84,9 @@
 
 
                         </li>
-                        {{-- <li>
+                        <li>
                             <a class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-red-700 dark:hover:bg-meta-4"
-                                href="{{ route('admin.event') }}"
+                                href="{{ route('admin.sports') }}"
                                 :class="{ ' dark:bg-meta-4': (selected === '') }">
                                 <svg class="fill-current" width="18" height="18" viewBox="0 0 18 18"
                                     fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -104,13 +104,13 @@
                                         fill="" />
                                 </svg>
 
-                                Judge
+                                Sports
 
 
                             </a>
 
 
-                        </li> --}}
+                        </li>
 
                     @else
                         <li>

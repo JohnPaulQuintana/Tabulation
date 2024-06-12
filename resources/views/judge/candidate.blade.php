@@ -94,7 +94,7 @@
             $(document).ready(function(){
                 
                 
-                // console.log(availablecategory)
+                // console.log(availablecategory.judge_count)
 
                 console.log(statusVote)
                 if(statusVote !== null){
@@ -108,8 +108,8 @@
                     // console.log($(this).data('candidate_id'))
                     $('#candidate_id').val($(this).data('candidate_id'))
                     $('#category_id').val(availablecategory.id)
-
-                    render(availablecategory.sub_category)
+                    let JudgeCount = availablecategory.event.judge.length;
+                    render(availablecategory.sub_category, JudgeCount)
                     $('#voteBackdrop').removeClass('hidden')
                     $('#voteModal').removeClass('hidden')
                 })
@@ -125,7 +125,8 @@
                     $('#vote_id').val($(this).data('vote_id'))
                     $('#editCandidateName').text($(this).data('name'))
                     $('#editCategoryName').text(availablecategory.category_name)
-                    edit($(this).data('vote_id'))
+                    let JudgeCount = availablecategory.event.judge.length;
+                    edit($(this).data('vote_id'),JudgeCount)
                     $('#editBackdrop').removeClass('hidden')
                     $('#editModal').removeClass('hidden')
                 })
@@ -136,13 +137,14 @@
 
             })
 
-            const render = (criteria) => {
+            const render = (criteria, judgeCount) => {
                 let renderCriteria = ''
                 criteria.forEach(c => {
+                    // console.log()
                     renderCriteria += `
                         <div class="flex justify-between items-center font-bold shadow mb-2 p-2">
                             <label for="criteria">${c.sub_category}: <span>- ${c.percentage}%</span></label>
-                            <input type="number" name="criteria[]" value="" class="rounded-md" required>
+                            <input type="number" name="criteria[]" value="" min='0' max="${inputRangeScore(c.percentage,100,judgeCount)}" step="0.1" placeholder="0-${inputRangeScore(c.percentage,100,judgeCount)}" class="rounded-md" required>
                         </div>
                     `
                 });
@@ -150,6 +152,15 @@
                 $('#renderCriteriaContainer').html(renderCriteria)
             }
 
+            //dynamically calculate the range input of the judge
+            const inputRangeScore = (p,m,n) => {
+                //maximumn total input
+                const mts = p*n;
+                //max judge range input
+                const rs = mts/n;
+                // console.log(rs)
+                return rs;
+            }
             const message = (message) => {
                 Swal.fire({
                     title: "Vote Recorded!",
@@ -161,7 +172,7 @@
 
             }
 
-            const edit = (id) => {
+            const edit = (id,judgeCount) => {
                 let data = {id:id}
                 sendRequest('GET', '{{ route('judge.edit') }}', data)
                 .then(function(res){
@@ -178,7 +189,7 @@
                                     renderCriteria += `
                                         <div class="flex justify-between items-center font-bold shadow mb-2 p-2">
                                             <label for="criteria">${key}: <span>- ${sc.percentage}%</span></label>
-                                            <input type="number" name="criteria[]" value="${value}" class="rounded-md" required>
+                                            <input type="number" name="criteria[]" value="${value}" min='0' max="${inputRangeScore(sc.percentage,100,judgeCount)}" step="0.1" placeholder="0-${inputRangeScore(sc.percentage,100,judgeCount)}" class="rounded-md" required>
                                         </div>
                                     `
                                 }

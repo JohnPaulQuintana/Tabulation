@@ -26,7 +26,13 @@
                         </div>
                         <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-4xl lg:text-4xl dark:text-white">{{ $judgeWithEvent->event->name }}</h1>
                         <p class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 lg:px-48 dark:text-gray-200">{{ $judgeWithEvent->event->details }}.</p>
-                        <a href="{{ route('judge.candidates') }}" class="bg-slate-700 p-4 rounded-md text-white hover:bg-slate-800 text-xl">Start</a>
+                        @if($judgeWithEvent->event->type === 'sport')
+                            <a href="{{ route('judge.sports') }}" class="bg-slate-700 p-4 rounded-md text-white hover:bg-slate-800 text-xl">Start Sport</a>
+                        
+                        @else
+                            <a href="{{ route('judge.candidates') }}" class="bg-slate-700 p-4 rounded-md text-white hover:bg-slate-800 text-xl">Start</a>
+                        @endif
+                        
                     </div>
                     <div class="bg-gradient-to-b from-blue-50 to-transparent dark:from-blue-900 w-full h-full absolute top-0 left-0 z-0"></div>
                 </section>

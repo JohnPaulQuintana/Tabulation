@@ -64,6 +64,10 @@ Route::group(['middleware' => ['auth','verified']], function () {
 
         // game start
         Route::get('/sports/game/{id}', [Administrator::class, 'game'])->name('sports.game');
+        Route::post('/sports/selected', [Administrator::class, 'teamToBattle'])->name('sports.store.selected');
+        Route::post('/sports/change', [Administrator::class, 'teamChange'])->name('sports.change.selected');
+        Route::post('/sports/judge', [Administrator::class, 'assignedJudge'])->name('sports.judge.selected');
+        Route::post('/sports/game/end', [Administrator::class, 'endGame'])->name('sports.game.end');
     });
 
     // judge
@@ -74,6 +78,11 @@ Route::group(['middleware' => ['auth','verified']], function () {
             Route::post('/vote',[JudgeController::class, 'vote'])->name('vote');
             Route::get('/edit',[JudgeController::class, 'edit'])->name('edit');
             Route::post('/update',[JudgeController::class, 'update'])->name('update');
+
+            //sports
+            Route::get('/sports',[JudgeController::class, 'sports'])->name('sports');
+            Route::post('/sports/player/score',[JudgeController::class, 'sportsPlayerScore'])->name('sports.player.score');
+            Route::post('/sports/player/score/update',[JudgeController::class, 'sportsPlayerScoreUpdate'])->name('sports.player.score.update');
         });
     });
 });

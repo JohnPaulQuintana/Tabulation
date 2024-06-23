@@ -6,8 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Candidate;
 use App\Models\Category;
 use App\Models\Event;
+use App\Models\Game;
+use App\Models\GameResult;
 use App\Models\Judge;
 use App\Models\Player;
+use App\Models\PlayerTotalScore;
+use App\Models\Scorer;
 use App\Models\SportCategory;
 use App\Models\SubCategory;
 use App\Models\Team;
@@ -18,7 +22,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 use Spatie\FlareClient\View;
 use Illuminate\Support\Facades\Storage;
-
+use Illuminate\Support\Facades\DB;
 class Administrator extends Controller
 {
     public function index()
@@ -342,6 +346,9 @@ class Administrator extends Controller
             'set_status' => 'required|in:0,1',
         ]);
 
+        // Find the currently active event and set its status to false
+        Event::where('status', 1)->update(['status' => 0]);
+
         // Find the event
         $event = Event::findOrFail($request->event_id);
 
@@ -606,10 +613,153 @@ class Administrator extends Controller
     //game start
     public function game(Request $request){
         // dd($request->id);
-        $sport = Event::with(['judge','teams','sportsCategories'])->find($request->id);
+        $sport = Event::with(['judge','teams','sportsCategories.game'=> function($q){
+            $q->where('status', 'ongoing');
+        }])->find($request->id);
         // dd($sport);
-        return view('admin.game', compact('sport'));
 
+        $inGame = Game::with(['sportCategory','team.players.playerTotalScore', 'team.scorer.judge'])->where('status','active')->get();
+
+        $activeGame = Game::with(['team.players.playerTotalScore', 'team.players.playerScore'])->where('status','active')->get();
+        // dd($activeGame);
+        
+
+        if($activeGame && $activeGame->count() >= 2){
+            // dd($activeGame[0]->team);
+            $firstTeam = $activeGame[0]->team;
+            $secondTeam = $activeGame[1]->team;
+            // $playerScore = 
+        }else{
+            // Initialize variables
+            $firstTeam = null;
+            $secondTeam = null;
+        }
+        
+        // dd($activeGame);
+        return view('admin.game.game', compact('sport', 'inGame', 'activeGame','firstTeam','secondTeam'));
+
+    }
+
+    //end game
+    public function endGame(Request $request){
+        // Update the status of games
+        $gamesU = Game::where('sport_category_id', $request->category_id)
+        ->update(['status' => 'completed']);
+
+        if ($gamesU) {
+            // Retrieve the updated games along with related teams, players, and player scores
+            $gameUpdated = Game::with(['team.players.playerTotalScore','sportCategory'])
+                ->where('sport_category_id', $request->category_id)
+                ->get();
+            // dd($gameUpdated);
+            // Iterate through each game to calculate the team scores and determine the winner and loser
+            $teamScores = [];
+            $event_id = 0;
+            foreach ($gameUpdated as $game) {
+                $teamScore = 0;
+                // Calculate the total score for each team
+                foreach ($game->team->players as $player) {
+                    $teamScore += $player->playerTotalScore->total_score;
+                }
+                $teamScores[$game->team->id] = $teamScore;
+            }
+            // Find the highest score
+            $highestScore = max($teamScores);
+            $lowestScore = min($teamScores);
+            $winnerTeamId = array_search($highestScore, $teamScores);
+            $loserTeamId = array_search($lowestScore, $teamScores);
+        
+            foreach ($gameUpdated as $key => $value) {
+                // dd($value);
+                $event_id = $value->sportCategory->event_id;
+                if($value->team_id == $winnerTeamId){
+                    GameResult::create([
+                        'sport_category_id'=>$value->sport_category_id,
+                        'team_id'=>$value->team_id,
+                        'status'=>'completed',
+                        'result'=>'win'
+                    ]);
+                }else{
+                    GameResult::create([
+                        'sport_category_id'=>$value->sport_category_id,
+                        'team_id'=>$loserTeamId,
+                        'status'=>'completed',
+                        'result'=>'lose'
+                    ]);
+                }
+                
+            }
+            return Redirect::route('admin.sports')->with(['validation'=>false,'modal'=>false, 'event_id'=>$event_id]);
+        }
+
+        
+       
+
+    }
+
+    //team to battle
+    public function teamToBattle(Request $request){
+        // dd($request);
+        // $validated = $request->validate([
+        //     'category_id' => 'required|exists:sport_categories,id',
+        // ]);
+
+        if(!isset($request->selectedTeams) || count($request->selectedTeams) < 2 || count($request->selectedTeams) > 2 || !isset($request->category_id)){
+            return Redirect::route('admin.sports.game', $request->event_id)->with(['validation'=>true,'modal'=>true, 'status'=>'false']); 
+        }
+
+        foreach ($request->selectedTeams as $value) {
+            Game::create([
+                'sport_category_id'=>$request->category_id,
+                'team_id'=>$value,
+                'status'=>'active',
+            ]);
+        }
+
+        return Redirect::route('admin.sports.game', $request->event_id)->with(['validation'=>false,'modal'=>false, 'status'=>true]); 
+        
+    }
+
+    //change team
+    public function teamChange(Request $request){
+        // dd($request);
+        // $validated = $request->validate([
+        //     'selectedTeam'=>'required',
+        // ]);
+
+        if(!isset($request->selectedTeam)){
+            return Redirect::route('admin.sports.game', $request->event_id)->with(['validation'=>true,'modalChange'=>true, 'status'=>'false']);   
+        }
+
+        $game = Game::find($request->game_id)->update(['team_id'=>$request->selectedTeam]);
+        if($game){
+            return Redirect::route('admin.sports.game', $request->event_id)->with(['validation'=>false,'modal'=>false, 'status'=>true]); 
+        }
+    }
+
+    //assigned judge to a sport
+    public function assignedJudge(Request $request){
+        // dd($request);
+        if(!isset($request->selectedJudge)){
+            return Redirect::route('admin.sports.game', $request->event_id)->with(['validation'=>true,'modalJudge'=>true, 'status'=>'false']);   
+        }
+
+        $assignedScorer = Scorer::where('game_id',$request->game_id)->first();
+        if($assignedScorer){
+             // Update the existing scorer
+             $assignedScorer->update([
+                'judge_id' => $request->selectedJudge,
+             ]);
+        }else{
+             // Create a new scorer
+            $assignedScorer = Scorer::create([
+                'game_id'=>$request->game_id,
+                'event_id'=>$request->event_id,
+                'team_id'=>$request->team_id,
+                'judge_id'=>$request->selectedJudge,
+            ]);
+        }
+        return Redirect::route('admin.sports.game', $request->event_id)->with(['validation'=>false,'modal'=>false, 'status'=>true]);
     }
 
     private function generateUniqueCode()

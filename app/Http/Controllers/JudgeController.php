@@ -5,9 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Candidate;
 use App\Models\Category;
 use App\Models\Event;
+use App\Models\Game;
 use App\Models\Judge;
 use App\Models\PercentageScore;
+use App\Models\PlayerScore;
+use App\Models\PlayerTotalScore;
+use App\Models\Scorer;
 use App\Models\Vote;
+use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
@@ -21,6 +26,87 @@ class JudgeController extends Controller
         $judgeWithEvent = Judge::with('event')->where('user_id', $id)->first();
         // dd($judgeWithEvent);
         return view('judge.index', compact('judgeWithEvent'));
+    }
+
+    //sports
+    public function sports()
+    {
+        $id = auth()->user()->id;
+        $activeGame = Scorer::with(['game.sportCategory.event','team.players.playerTotalScore'])->where('judge_id', $id)->first();
+        $enemyTeam = Scorer::with(['team.players.playerTotalScore'])->where('judge_id','!=', $id)->first();
+        $endGame = Scorer::with('game')->first();
+        // dd($endGame);
+        if(empty($endGame)){
+            return Redirect::route('judge.dashboard')->with(['response' => "The game is not ready yet, Please wait until its ready!."]);
+        }else if($endGame->game->status == 'completed'){
+            return Redirect::route('judge.dashboard')->with(['response' => "The game is already ended!."]);
+        }else if(!$activeGame || !$enemyTeam){
+            return Redirect::route('judge.dashboard')->with(['response' => "There's is no team asigned to you or enemy team is not set!, informed the administrator about this."]);
+        }
+        return view('judge.sports.sport', compact('activeGame', 'enemyTeam'));
+    }
+
+    //player score stored
+    public function sportsPlayerScore(Request $request){
+        // dd($request);
+        if(empty($request->score)){
+            // dd('yes');
+            return Redirect::route('judge.sports')->with(['error' => true]); 
+        }
+
+        $playerScore = PlayerScore::create([
+            'game_id'=>$request->game_id,
+            'team_id'=>$request->team_id,
+            'event_id'=>$request->event_id,
+            'judge_id'=>$request->judge_id,
+            'player_id'=>$request->player_id,
+            'score'=>$request->score,
+        ]);
+        if($playerScore){
+             // Find the PlayerTotalScore by player_id
+            $playerTotalScore = PlayerTotalScore::where('player_id', $playerScore->player_id)->where('game_status',0)->first();
+            if ($playerTotalScore) {
+                // Update the existing score
+                $playerTotalScore->update([
+                    'total_score' => $playerTotalScore->total_score + $playerScore->score,
+                ]);
+            } else {
+                // Create a new PlayerTotalScore record
+                PlayerTotalScore::create([
+                    'player_id' => $playerScore->player_id,
+                    'total_score' => $playerScore->score,
+                    'game_status'=>false,//means on going
+                ]);
+            }
+        }
+        return Redirect::route('judge.sports')->with(['success' => true]); 
+    }
+
+    //update the total score
+    public function sportsPlayerScoreUpdate(Request $request){
+        // dd($request);
+        $scoreId = $request->total_score_id;
+        if(empty($request->player_total_score)){
+            return Redirect::route('judge.sports')->with(['error' => true]); 
+        }
+        $playerTotalScore = PlayerTotalScore::find($scoreId);
+        if($playerTotalScore){
+            $playerTotalScore->update(['total_score' => $request->player_total_score]);
+            // Check if the update was successful
+            if ($playerTotalScore->wasChanged('total_score')) {
+                // Find the latest PlayerScore for the given player_id and delete it
+                $latestPlayerScore = PlayerScore::where('player_id', $playerTotalScore->player_id)
+                                                ->orderBy('created_at', 'desc')
+                                                ->first();
+                if ($latestPlayerScore) {
+                    $latestPlayerScore->delete();
+                }
+            }
+
+        }
+        return Redirect::route('judge.sports')->with(['success' => true]); 
+        
+        
     }
 
     // display candidates

@@ -84,76 +84,83 @@
         <script>
             $(document).ready(function() {
                 let pieChartDatas = @json($events);
+                let events = @json($activeEvents);
+                let categories = @json($categoriesChart);
+                let Teams = @json($teams);
                
-                console.log(pieChartDatas)
+                console.log(categories)
+                $('#title').text(events.name)
+                $('#sub-title').text(events.details)
                 // bar chart
                 const options = {
                     colors: ["#1A56DB", "#FDBA8C"],
                     series: [{
-                            name: "Organic",
+                            name: "Win",
                             color: "#1A56DB",
-                            data: [{
-                                    x: "Mon",
-                                    y: 231
-                                },
-                                {
-                                    x: "Tue",
-                                    y: 122
-                                },
-                                {
-                                    x: "Wed",
-                                    y: 63
-                                },
-                                {
-                                    x: "Thu",
-                                    y: 421
-                                },
-                                {
-                                    x: "Fri",
-                                    y: 122
-                                },
-                                {
-                                    x: "Sat",
-                                    y: 323
-                                },
-                                {
-                                    x: "Sun",
-                                    y: 111
-                                },
-                            ],
+                            // data: [{
+                            //         x: "Monw",
+                            //         y: 231
+                            //     },
+                            //     {
+                            //         x: "Tue",
+                            //         y: 122
+                            //     },
+                            //     {
+                            //         x: "Wed",
+                            //         y: 63
+                            //     },
+                            //     {
+                            //         x: "Thu",
+                            //         y: 421
+                            //     },
+                            //     {
+                            //         x: "Fri",
+                            //         y: 122
+                            //     },
+                            //     {
+                            //         x: "Sat",
+                            //         y: 323
+                            //     },
+                            //     {
+                            //         x: "Sun",
+                            //         y: 111
+                            //     },
+                            // ],
+                            data: categories,
                         },
                         {
-                            name: "Social media",
+                            name: "Lose",
                             color: "#FDBA8C",
-                            data: [{
-                                    x: "Mon",
-                                    y: 232
-                                },
-                                {
-                                    x: "Tue",
-                                    y: 113
-                                },
-                                {
-                                    x: "Wed",
-                                    y: 341
-                                },
-                                {
-                                    x: "Thu",
-                                    y: 224
-                                },
-                                {
-                                    x: "Fri",
-                                    y: 522
-                                },
-                                {
-                                    x: "Sat",
-                                    y: 411
-                                },
-                                {
-                                    x: "Sun",
-                                    y: 243
-                                },
-                            ],
+                            // data: [{
+                            //         x: "Mon",
+                            //         y: 232
+                            //     },
+                            //     {
+                            //         x: "Tue",
+                            //         y: 113
+                            //     },
+                            //     {
+                            //         x: "Wed",
+                            //         y: 341
+                            //     },
+                            //     {
+                            //         x: "Thu",
+                            //         y: 224
+                            //     },
+                            //     {
+                            //         x: "Fri",
+                            //         y: 522
+                            //     },
+                            //     {
+                            //         x: "Sat",
+                            //         y: 411
+                            //     },
+                            //     {
+                            //         x: "Sun",
+                            //         y: 243
+                            //     },
+                            // ],
+                            data: categories,
                         },
                     ],
                     chart: {

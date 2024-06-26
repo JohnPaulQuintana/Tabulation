@@ -31,7 +31,34 @@ class Administrator extends Controller
         $candidates = Candidate::get();
         $judges = Judge::get();
         $categories = Category::get();
-        return view('admin.index', compact('events', 'candidates', 'judges', 'categories'));
+
+        $activeEvents = Event::where('status',1)->first();
+        if($activeEvents && $activeEvents->type === 'sport'){
+             // Initialize empty arrays for categories chart and teams
+            $categoriesChart = [];
+            $teams = [];
+            // Retrieve all categories
+            $categories = SportCategory::get();
+
+            // Iterate over each category
+            foreach ($categories as $category) {
+                $categoriesChart[] = ['x' => $category->category, 'y' => random_int(10,100)];
+                // dd($category);
+                // Fetch game results related to the current sport category
+                $gameResults = GameResult::with('team')->where('sport_category_id', $category->id)->get();
+
+                // Add data to the categories chart and teams arrays
+                foreach ($gameResults as $gameResult) {
+                    // if(){
+                    //     $categoriesChartTeam1[] = ['x' => $category->category, 'y' => ($gameResult->result=='win'? random_int(10,100) : random_int(5,30))];
+                    //     $teams[] = ['t' => $gameResult->team->team_name];
+                    // }
+                    
+                }
+            }
+            // dd($categoriesChart, $teams);
+        }
+        return view('admin.index', compact('events', 'candidates', 'judges', 'categories', 'activeEvents','categoriesChart','teams'));
     }
 
     public function event()

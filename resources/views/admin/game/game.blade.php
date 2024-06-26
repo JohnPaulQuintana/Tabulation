@@ -255,7 +255,7 @@
                     renderResults += `
                         <div class="shadow p-2 grid grid-cols-1 items-center bg-slate-100">
                             <div class="col-span-2 font-bold text-green-500 uppercase text-center">
-                                <h1>${c.category}</h1>
+                                <h1>${c.category} <i class="fa-solid fa-print text-slate-800 hover:text-slate-900 hover:cursor-pointer"></i></h1>
                             </div>
                             <div class="col-span-2 flex items-center gap-4 w-full">
                                 <div class="rounded-md flex-1 text-center text-sm bg-white py-2">
@@ -284,7 +284,7 @@
                         <img class="w-[60px] h-[60px]" src="${firstProfile}/${f.profile}" alt="" srcset="">
                         <div class="font-bold text-start">
                             <span class="text-[12px] p-0">${f.team_name}</span>
-                            <span class="text-[12px] p-0">Players : 2</span>
+                            <span class="text-[12px] p-0 block">Players : 2</span>
                             <div class="flex gap-2 bg-slate-100 text-[12px] p-0">
                                 <span>Win : 2</span>|
                                 <span>Lose : 2</span>

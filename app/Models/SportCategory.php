@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Event;
 use App\Models\Game;
+use App\Models\GameResult;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,5 +21,8 @@ class SportCategory extends Model
 
     public function game() :HasMany{
         return $this->hasMany(Game::class);
+    }
+    public function gameResults() :HasMany{
+        return $this->hasMany(GameResult::class);
     }
 }

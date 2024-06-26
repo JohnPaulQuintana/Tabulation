@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Event;
+use App\Models\GameResult;
 use App\Models\SubCategory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,4 +23,6 @@ class Category extends Model
     public function subCategory() :HasMany{
         return $this->hasMany(SubCategory::class);
     }
+
+    
 }

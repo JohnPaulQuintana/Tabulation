@@ -124,6 +124,7 @@
     @include('admin.game.modal.change-team')
     @include('admin.game.modal.assigned-judge')
     @include('admin.game.modal.result')
+    @include('admin.game.modal.completed')
 
     @section('scripts')
         <script>
@@ -136,15 +137,20 @@
             let modal = @json(session('modal'));
             let modalChange = @json(session('modalChange'));
             let modalJudge = @json(session('modalJudge'));
+            let game = @json(session('game'));
             let status = @json(session('status'));
             let sessionCategoryId = @json(session('category_id'));
             let sessionEventId = @json(session('event_id'));
+
+            let gameResults = @json($teamGameResultsCount);
             console.log(categories)
+            // console.log(gameResults)
+            
             // console.log('conected')
             $(document).ready(function(){
                 //for debug
                 // console.log(modalChange)
-               
+                // $('#completedModalGame').trigger('click')
 
                 if(modal){
                     renderTeams(teams)
@@ -158,6 +164,8 @@
                     success('Judge is required!','Please select a judge.','error');
                 }else if(status){
                     success('Matched Successfully.','the matched is set successfully.','success')
+                }else if(game === false){
+                    success('Matched is saved.','available at game completed action button.','success');
                 }
                 
                 //setup the game
@@ -210,7 +218,63 @@
                 $('#gameCompleted').click(function(){
                     $('#endGame').trigger('click')
                 })
+
+                //show completed game
+                $('#completedGame').click(function(){
+                    // alert('yes');
+                    renderGames(gameResults,teams)
+                    $('#completedModalGame').trigger('click')
+                })
+               
             })
+            
+            const renderGames = (results, teams) => {
+                console.log(teams);
+                let renderResults = '';
+                
+                results.forEach(c => {
+                    // Initialize objects for the two teams
+                    let team1 = { name: '', result: '' };
+                    let team2 = { name: '', result: '' };
+
+                    console.log(c);
+
+                    teams.forEach(t => {
+                        if (t.id == c.game_results[0].team_id) {
+                            console.log(t);
+                            team1.name = t.team_name;
+                            team1.result = c.game_results[0].result;
+                        }
+                        if (t.id == c.game_results[1].team_id) {
+                            console.log(t);
+                            team2.name = t.team_name;
+                            team2.result = c.game_results[1].result;
+                        }
+                    });
+
+                    renderResults += `
+                        <div class="shadow p-2 grid grid-cols-1 items-center bg-slate-100">
+                            <div class="col-span-2 font-bold text-green-500 uppercase text-center">
+                                <h1>${c.category}</h1>
+                            </div>
+                            <div class="col-span-2 flex items-center gap-4 w-full">
+                                <div class="rounded-md flex-1 text-center text-sm bg-white py-2">
+                                    ${team1.name}
+                                    <span class="block text-green-500 uppercase">${team1.result}</span>
+                                </div>
+                                <div class="font-bold">VS</div>
+                                <div class="rounded-md flex-1 text-center text-sm bg-white py-2">
+                                    ${team2.name}
+                                    <span class="block text-red-500 uppercase">${team2.result}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                $('#renderGameResults').html(renderResults);
+            };
+
             const renderFirstTeam = (f)=>{
                 let first = ''
                 let totalFScore = 0;
@@ -258,7 +322,7 @@
                        
                         <div class="font-bold text-start">
                             <span class="text-[12px] p-0">${s.team_name}</span>
-                            <span class="text-[12px] p-0">Players : 2</span>
+                            <span class="text-[12px] p-0 block">Players : 2</span>
                             <div class="flex gap-2 bg-slate-100 text-[12px] p-0">
                                 <span>Win : 2</span>|
                                 <span>Lose : 2</span>

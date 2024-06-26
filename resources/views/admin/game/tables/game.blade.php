@@ -21,6 +21,7 @@
                     Overview
                 </div>
                 <div
+                    id="completedGame"
                     {{-- data-active_game="{{ count($activeGame) > 0 ? $activeGame[0]->sport_category_id : 0 }}" --}}
                     class="bg-slate-500 text-white p-1 rounded-sm hover:bg-slate-700 hover:cursor-pointer">
                     <i class="fa-solid fa-game-board-simple"></i>

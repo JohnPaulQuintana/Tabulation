@@ -15,6 +15,7 @@ use App\Models\Vote;
 use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 
 class JudgeController extends Controller
@@ -32,13 +33,46 @@ class JudgeController extends Controller
     public function sports()
     {
         $id = auth()->user()->id;
-        $activeGame = Scorer::with(['game.sportCategory.event','team.players.playerTotalScore'])->where('judge_id', $id)->first();
-        $enemyTeam = Scorer::with(['team.players.playerTotalScore'])->where('judge_id','!=', $id)->first();
-        $endGame = Scorer::with('game')->first();
-        // dd($endGame);
+        $activeGame = Scorer::with(['game.sportCategory.event','team.players.playerTotalScore'])
+        ->where('judge_id', $id)
+        ->whereHas('game', function($q){
+            $q->where('status','active');
+        })
+        ->first();
+        // $filteredGames = $activeGame->filter(function ($value, $key) {
+        //     return optional($value->game)->status !== 'completed';
+        // });
+        // dd($activeGame);
+        //get the event judge
+        $judges = Event::with('judge')
+        ->where('id',$activeGame->event_id)
+        ->first();
+        
+        $filteredJudges = $judges->judge->filter(function ($judge) use ($id) {
+            // dd($judge->id);
+            return $judge->id !== $id;
+        });
+        // Get the first item from the filtered collection
+        $versus = $filteredJudges->first();
+        // dd($versus->id);
+        
+        // $activeGame = DB::table('scorers')->select('scorers.*')->where('judge_id', $id)->first();
+        
+        $enemyTeam = Scorer::with(['game.sportCategory.event','team.players.playerTotalScore'])
+        ->where('judge_id', $versus->id)
+        ->whereHas('game', function($q){
+            $q->where('status','active');
+        })
+        ->first();
+        // dd($enemyTeam);
+        $endGame = Scorer::with(['game'=>function($q){
+            $q->where('status','active');
+        }])->first();
+        // dd($activeGame);
+        
         if(empty($endGame)){
             return Redirect::route('judge.dashboard')->with(['response' => "The game is not ready yet, Please wait until its ready!."]);
-        }else if($endGame->game->status == 'completed'){
+        }else if(optional($endGame->game)->status == 'completed'){
             return Redirect::route('judge.dashboard')->with(['response' => "The game is already ended!."]);
         }else if(!$activeGame || !$enemyTeam){
             return Redirect::route('judge.dashboard')->with(['response' => "There's is no team asigned to you or enemy team is not set!, informed the administrator about this."]);

@@ -322,14 +322,14 @@ class Administrator extends Controller
                 $q->where('category_id', $activeCategory->id);
             }, 'judge', 'category.subCategory', 'candidates.percentageScores'
         ])->find($request->id);
-        //    dd($activeEvents);
+        //    dd($activeEvents->category);
         // Iterate over each candidate
         foreach ($activeEvents->candidates as $candidate) {
             // per criteria
             // $votePerCandidates = $this->calculateTotalPerCriteria($candidate, $activeCategory->subCategory);
             //total
 
-            $votePerCandidates = $this->calculateTotalPercentage($candidate, $activeCategory->subCategory);
+            $votePerCandidates = $this->calculateTotalPercentage($candidate, $activeEvents->category);
             // dd($votePerCandidates);
             $candidate->vote_results = $votePerCandidates;
         }
@@ -622,7 +622,9 @@ class Administrator extends Controller
 
         $activeGame = Game::with(['team.players.playerTotalScore', 'team.players.playerScore'])->where('status','active')->get();
         // dd($activeGame);
-        
+        $teamGameResultsCount = SportCategory::with(['gameResults'])->whereHas('gameResults')->get();
+        // $gameCategory = SportCategory::get();
+        // dd($teamGameResultsCount);
 
         if($activeGame && $activeGame->count() >= 2){
             // dd($activeGame[0]->team);
@@ -636,7 +638,7 @@ class Administrator extends Controller
         }
         
         // dd($activeGame);
-        return view('admin.game.game', compact('sport', 'inGame', 'activeGame','firstTeam','secondTeam'));
+        return view('admin.game.game', compact('sport', 'inGame', 'activeGame','firstTeam','secondTeam','teamGameResultsCount'));
 
     }
 
@@ -659,7 +661,7 @@ class Administrator extends Controller
                 $teamScore = 0;
                 // Calculate the total score for each team
                 foreach ($game->team->players as $player) {
-                    $teamScore += $player->playerTotalScore->total_score;
+                    $teamScore += $player->playerTotalScore->total_score ?? 0;
                 }
                 $teamScores[$game->team->id] = $teamScore;
             }
@@ -689,7 +691,7 @@ class Administrator extends Controller
                 }
                 
             }
-            return Redirect::route('admin.sports')->with(['validation'=>false,'modal'=>false, 'event_id'=>$event_id]);
+            return Redirect::route('admin.sports.game', $event_id)->with(['validation'=>false,'modal'=>false,'game'=>false, 'event_id'=>$event_id]);
         }
 
         
@@ -791,15 +793,18 @@ class Administrator extends Controller
         return $candidateVotesPerCriteria;
     }
 
-    private function calculateTotalPercentage($candidate, $subCategories)
+    private function calculateTotalPercentage($candidate, $categories)
     {
-        $totalCategory = count($subCategories);
+        // dd($categories);
+        $totalCategory = count($categories);
+        // dd($totalCategory);
         $candidateOverAllVotes = []; // Initialize here to reset for each candidate
         $overAllScore = 0;
         foreach ($candidate->percentageScores as $vote) {
             $overAllScore += $vote->total_score;
         }
         // Calculate the overall percentage
+        // dd($overAllScore);
         $overallPercentage = $overAllScore / $totalCategory;
         // dd($overallPercentage);
         $candidateOverAllVotes['total'] = $overallPercentage;

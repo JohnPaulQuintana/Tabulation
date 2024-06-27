@@ -58,7 +58,8 @@ class Administrator extends Controller
             }
             // dd($categoriesChart, $teams);
         }
-        return view('admin.index', compact('events', 'candidates', 'judges', 'categories', 'activeEvents','categoriesChart','teams'));
+        // return view('admin.index', compact('events', 'candidates', 'judges', 'categories', 'activeEvents','categoriesChart','teams'));
+        return view('admin.index', compact('events', 'candidates', 'judges', 'categories', 'activeEvents'));
     }
 
     public function event()

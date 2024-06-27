@@ -175,7 +175,10 @@
                                                 <span>{{ $category->category_name }}</span>
                                             </div>
 
-                                            <a data-category="{{ $category->id }}" href="#" class="editCategory text-blue-500 px-1 rounded-md hover:text-blue-700"><i class="fa-solid fa-pen-to-square"></i></a>
+                                            <div>
+                                                <a data-category="{{ $category->id }}" href="#" class="printResult text-blue-500 px-1 rounded-md hover:text-blue-700"><i class="fa-solid fa-print"></i></a>
+                                                <a data-category="{{ $category->id }}" href="#" class="editCategory text-blue-500 px-1 rounded-md hover:text-blue-700"><i class="fa-solid fa-pen-to-square"></i></a>
+                                            </div>
                                         </h1>
                                         @foreach ($category->subCategory as $sub)
                                             <div class="flex justify-between items-center gap-2 bg-slate-100 p-1 capitalize">
@@ -220,9 +223,14 @@
         @endif
 
         @include('admin.category.edit')
+        @include('admin.print.print')
         @section('scripts')
             <script>
+                let dataToPrint = @json($dataToPrint);
+                console.log(dataToPrint)
                 $(document).ready(function(){
+                    //debug
+                    // $('#printModalGame').trigger('click')
                     $('#statusCloseBtn').click(function(){
                         $('#statusBackdrop').addClass('hidden')
                         $('#statusModal').addClass('hidden')
@@ -266,6 +274,26 @@
                             .catch(function(err){
                                 console.log(err)
                             })
+                    })
+
+                    //print result
+                    $('.printResult').click(function(){
+                        let id = $(this).data('category')
+                        // alert(id)
+                        dataToPrint.forEach(d => {
+                            if(d.id == id){
+                                // console.log(d)
+                                let renderData = ''
+                                $('#selectedCategory').text(d.category_name)
+
+                                d.sub_category.forEach(s => {
+                                    renderData += `
+                                             
+                                    `
+                                });
+                                $('#printModalGame').trigger('click')
+                            }
+                        });
                     })
 
                     $('#editCloseBtn').click(function(){

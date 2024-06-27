@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Event;
 use App\Models\GameResult;
 use App\Models\SubCategory;
+use App\Models\Vote;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,6 +24,8 @@ class Category extends Model
     public function subCategory() :HasMany{
         return $this->hasMany(SubCategory::class);
     }
+
+    
 
     
 }

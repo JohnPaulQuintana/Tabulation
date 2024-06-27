@@ -47,6 +47,7 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4/animate.min.css">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.6/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./node_modules/apexcharts/dist/apexcharts.css">
     @yield('links')
     
 </head>

@@ -33,33 +33,39 @@ class Administrator extends Controller
         $categories = Category::get();
 
         $activeEvents = Event::where('status',1)->first();
+        $categoriesChart = [];
+        $teams = [];
+        
         if($activeEvents && $activeEvents->type === 'sport'){
-             // Initialize empty arrays for categories chart and teams
-            $categoriesChart = [];
-            $teams = [];
             // Retrieve all categories
             $categories = SportCategory::get();
-
             // Iterate over each category
             foreach ($categories as $category) {
                 $categoriesChart[] = ['x' => $category->category, 'y' => random_int(10,100)];
-                // dd($category);
-                // Fetch game results related to the current sport category
+                // // dd($category);
+                // // Fetch game results related to the current sport category
                 $gameResults = GameResult::with('team')->where('sport_category_id', $category->id)->get();
-
+                // dd($gameResults);
                 // Add data to the categories chart and teams arrays
                 foreach ($gameResults as $gameResult) {
                     // if(){
-                    //     $categoriesChartTeam1[] = ['x' => $category->category, 'y' => ($gameResult->result=='win'? random_int(10,100) : random_int(5,30))];
-                    //     $teams[] = ['t' => $gameResult->team->team_name];
+                        // $categoriesChartTeam1[] = ['x' => $category->category, 'y' => ($gameResult->result=='win'? random_int(10,100) : random_int(5,30))];
+                        // $teams[] = ['t' => $gameResult->team->team_name];
                     // }
                     
                 }
             }
             // dd($categoriesChart, $teams);
+        }else{
+            // Retrieve all categories
+            $categories = Category::get();
+            // dd($categories);
+            foreach ($categories as $category) {
+                $categoriesChart[] = ['x' => $category->category_name, 'y' => random_int(10,100)];
+            }
         }
-        // return view('admin.index', compact('events', 'candidates', 'judges', 'categories', 'activeEvents','categoriesChart','teams'));
-        return view('admin.index', compact('events', 'candidates', 'judges', 'categories', 'activeEvents'));
+        return view('admin.index', compact('events', 'candidates', 'judges', 'categories', 'activeEvents','categoriesChart','teams'));
+        // return view('admin.index', compact('events', 'candidates', 'judges', 'categories', 'activeEvents'));
     }
 
     public function event()
@@ -339,6 +345,9 @@ class Administrator extends Controller
     //start the event
     public function startEvent(Request $request)
     {
+        //printing process
+        $dataToPrint = Category::with(['event.judge.votes','subCategory'])->get();
+        // dd($dataToPrint);
 
         $activeCategory = Category::with('subCategory')->where('status', true)->first();
         if (!$activeCategory) {
@@ -362,7 +371,7 @@ class Administrator extends Controller
             $candidate->vote_results = $votePerCandidates;
         }
         // dd($activeEvents);
-        return view('admin.start', compact('activeEvents', 'activeCategory'));
+        return view('admin.start', compact('activeEvents', 'activeCategory', 'dataToPrint'));
     }
 
     //update the event status

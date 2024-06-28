@@ -44,9 +44,11 @@ class JudgeController extends Controller
         // });
         // dd($activeGame);
         //get the event judge
+       if($activeGame){
         $judges = Event::with('judge')
         ->where('id',$activeGame->event_id)
         ->first();
+       }
         
         $filteredJudges = $judges->judge->filter(function ($judge) use ($id) {
             // dd($judge->id);

@@ -26,61 +26,49 @@
                 </button>
             </div>
 
-            <div>
+            <div id="contents">
                 
                 <div class="p-4 sm:p-10 overflow-y-auto">
-                    <div class="mb-6 text-center">
-                        <h3 class="mb-2 text-xl font-bold text-gray-800 dark:text-neutral-200">
+                    <div class="mb-6 text-center sm:bg-green-500 sm:text-white">
+                        <h3 class="mb-2 text-2xl font-bold text-gray-800 dark:text-neutral-200">
                             Category Vote Result's
                         </h3>
                         <p class="text-gray-500 dark:text-neutral-500">
                             This is the result of the category and the judge's score
                         </p>
 
+                        <span>Date and Time: {{ now()->format('F j, Y, g:i A') }}</span>
+
                     </div>
                 </div>
 
                 <!-- Card Section -->
-                <div class="max-w-[85rem] h-[350px] px-4 p-2 -mt-10 sm:px-6 lg:px-8 mx-auto overflow-y-auto">
+                <div class="max-w-[85rem] px-4 p-2 -mt-10 sm:px-6 lg:px-8 mx-auto overflow-y-auto mb-4">
                     <div class="mb-5">
-                        <h1>Vote Result for <span id="selectedCategory"></span></h1>
-                       @for ($i = 0; $i < 5; $i++)
+                        <h1 class="text-slate-500 font-bold">Leading Candidate's for <span class="" id="selectedCategoryLeading"></span></h1>
+                       {{-- @for ($i = 0; $i < 5; $i++) --}}
                             <!-- flex for judges -->
-                        <div class="flex items-center gap-2 border border-slate-500 p-2">
-
-                            <div class="shadow text-center px-2">
-                                <span class="text-xs">Name:</span>
-                                <span class="block uppercase text-sm font-bold">Judge 1</span>
-                            </div>
+                        <div class="flex gap-2 flex-wrap items-center border py-2 bg-slate-100" id="renderVoteCategoryLeadingResult">
                             
-                            <div class="shadow text-center px-2">
-                                <span class="text-xs">Physical Fitness:(50%)</span>
-                                <span class="block uppercase text-sm font-bold">100</span>
-                            </div>
-                            
-                            <div class="shadow text-center px-2">
-                                <span class="text-xs">Skill Level:(50%)</span>
-                                <span class="block uppercase text-sm font-bold">100</span>
-                            </div>
-
-                            <div class="shadow text-center px-2">
-                                <span class="text-xs">Skill Level:(50%)</span>
-                                <span class="block uppercase text-sm font-bold">100</span>
-                            </div>
-                            
-                            <div class="shadow text-center px-2">
-                                <span class="text-xs">Skill Level:(50%)</span>
-                                <span class="block uppercase text-sm font-bold">100</span>
-                            </div>
-                            
-                            <div class="shadow px-2 flex-1 text-end">
-                                <span class="text-xs mx-4">Signature</span>
-                                <span class="block uppercase text-sm font-bold">____________</span>
-                            </div>
-
                         </div>
                         <!-- End flex for judges -->
-                       @endfor
+                       {{-- @endfor --}}
+                    </div>
+
+                    
+                </div>
+                <!-- End Card Section -->
+                <!-- Card Section -->
+                <div class="max-w-[85rem] md:h-[200px] px-4 p-2 -mt-10 sm:px-6 lg:px-8 mx-auto overflow-y-auto">
+                    <div class="mb-5">
+                        <h1 class="text-slate-500 font-bold">Vote Result for <span id="selectedCategory"></span></h1>
+                       {{-- @for ($i = 0; $i < 5; $i++) --}}
+                            <!-- flex for judges -->
+                        <div id="renderVoteCategoryResult">
+                            
+                        </div>
+                        <!-- End flex for judges -->
+                       {{-- @endfor --}}
                     </div>
 
                     
@@ -97,6 +85,7 @@
                     </button>
                     
                     <button
+                        id="printNow"
                         class="py-2 px-3 inline-flex items-center gap-x-2 text-sm rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
                         >
                         Print Result

@@ -179,10 +179,10 @@
                                         {{ $p->created_at }}
                                     </td>
                                     <td class="px-6 py-4 text-blue-500">
-                                        <a href="#" data-candidate_id="{{ $p->id }}" class="editCandidate">
+                                        <a href="#" data-player_id="{{ $p->id }}" class="editPlayer">
                                             <i class="fa-solid fa-pen-to-square text-xl hover:text-blue-700"></i>
                                         </a>
-                                        <a href="{{ route('admin.candidate.destroy', $p->id) }}">
+                                        <a href="{{ route('admin.sports.destroy.player', $p->id) }}">
                                             <i class="fa-solid fa-square-minus text-xl text-red-500 hover:text-red-700"></i>
                                         </a>
                                     </td>
@@ -195,17 +195,38 @@
         </div>
     </div>
 
+    @include('admin.sport.modal.edit-player')
+
     @section("scripts")
         <script>
             let success = @json(session('success'));
+            let title = @json(session('title'));
             let message = @json(session('message'));
-            // console.log(success)
+            let teamWithPlayer = @json($team->players);
+
+            console.log(teamWithPlayer)
             $(document).ready(function(){
+                // $('#openModalPlayerEdit').trigger('click')
+
+                $('.editPlayer').click(function(){
+                    let playerID = $(this).data('player_id')
+                    let path = "{{ asset('storage') }}"
+                    // alert(playerID)
+                    teamWithPlayer.forEach(p => {
+                        if(p.id === playerID){
+                            $('#update_player_id').val(playerID)
+                            $('#update_team_id').val(p.team_id)
+                            $('#update_player_name').val(p.name)
+                            $('#updateProfileDisplay').attr('src', `${path}/${p.profile}`)
+                            $('#openModalPlayerEdit').trigger('click')
+                        }
+                    });
+                })
                 if(success !== null){
                     Swal.fire({
-                        title: "Successfully!",
+                        title: title,
                         text: message,
-                        icon: "success"
+                        icon: success
                     });
                 }
             })

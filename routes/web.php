@@ -33,6 +33,7 @@ Route::group(['middleware' => ['auth','verified']], function () {
         Route::post('/store', [Administrator::class, 'store'])->name('store');
         Route::get('/category/{id}', [Administrator::class, 'category'])->name('category');
         Route::post('/category/store', [Administrator::class, 'categoryStore'])->name('category.store');
+        Route::get('/category/destroy/{id}', [Administrator::class, 'categoryDestroy'])->name('category.destroy');
         Route::get('/judge/{id}', [Administrator::class, 'judge'])->name('judge');
         Route::post('/judge/store', [Administrator::class, 'judgeStore'])->name('judge.store');
         Route::post('/judge/update', [Administrator::class, 'judgeUpdate'])->name('judge.update');
@@ -57,6 +58,8 @@ Route::group(['middleware' => ['auth','verified']], function () {
         Route::get('/sports/team/{id}', [Administrator::class, 'team'])->name('sports.team');
         Route::post('/sports/update/team', [Administrator::class, 'updateTeam'])->name('sports.update.team');
         Route::post('/sports/store/player', [Administrator::class, 'storePlayer'])->name('sports.store.player');
+        Route::post('/sports/update/player', [Administrator::class, 'updatePlayer'])->name('sports.update.player');
+        Route::get('/sports/destroy/player/{id}', [Administrator::class, 'destroyPlayer'])->name('sports.destroy.player');
 
         //sport category
         Route::post('/sports/category', [Administrator::class, 'sportCategoryStore'])->name('sports.category');

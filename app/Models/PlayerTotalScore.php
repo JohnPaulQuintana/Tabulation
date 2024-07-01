@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class PlayerTotalScore extends Model
 {
     use HasFactory;
-    protected $fillable = ['player_id','total_score','game_status'];
+    protected $fillable = ['player_id','total_score','game_status', 'game_id'];
 
     public function playerScore() :BelongsTo{
         return $this->belongsTo(Player::class);

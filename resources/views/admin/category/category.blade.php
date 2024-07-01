@@ -115,8 +115,8 @@
 
                                                             <i data-category_id="{{ $c->id }}"
                                                                 class="edit_category fa-sharp fa-solid fa-pen-to-square text-[22px] text-green-500 hover:cursor-pointer hover:text-green-700"></i>
-                                                            <i
-                                                                class="fa-solid fa-square-xmark text-2xl text-red-500 hover:text-red-700 hover:cursor-pointer"></i>
+                                                            <a href="{{ route('admin.category.destroy', $c->id) }}"
+                                                                class="fa-solid fa-square-xmark text-2xl text-red-500 hover:text-red-700 hover:cursor-pointer"></a>
                                                         </div>
                                                     </div>
                                                     <div class="flex gap-2 items-center">
@@ -180,11 +180,26 @@
         <script>
             $(document).ready(function() {
                 let status = @json(session('save_category'));
+                let deleteC = @json(session('delete_category'));
+                let lc = @json(session('limit_category'));
                 let categories = @json($categories);
                 console.log(categories)
                 if (status !== null) {
                     successMessage()
+                }else if(deleteC !== null){
+                    Swal.fire({
+                        title: "Category Deleted!",
+                        text: "Successfully deleted a category!",
+                        icon: "success"
+                    });
+                }else if(lc !== null){
+                    Swal.fire({
+                        title: "Category Error!",
+                        text: "Category Percentage id less than or greater than, we only accept total of 100%!",
+                        icon: "error"
+                    }); 
                 }
+
 
                 $(".edit_category").click(function(){
                     // alert($(this).data('category_id'))

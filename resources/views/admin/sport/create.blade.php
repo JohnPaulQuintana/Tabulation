@@ -90,7 +90,7 @@
                                             <input type="date" name="event_date" class="block p-2 w-full rounded-md"
                                                 value="{{ old('event_date') }}">
                                             @error('event_date')
-                                                <span class="text-red-500">Date of sports is required.</span>
+                                                <span class="text-red-500">{{ $message }}</span>
                                             @enderror
                                         </div>
                                         <div class="px-1">

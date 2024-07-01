@@ -30,8 +30,12 @@
                                 <h1>{{ $activeGame->team->team_name }}</h1>
                                 <h1 class="text-sm">Players : {{ count($activeGame->team->players) }}</h1>
                                 <div class="flex gap-2 bg-slate-100 text-sm">
-                                    <h1>Win : {{ count($activeGame->team->players) }}</h1>|
-                                    <h1>Lose : {{ count($activeGame->team->players) }}</h1>
+
+                                    <h1>Win : {{ $activeGame->team->gameResult->isNotEmpty() ? $activeGame->team->gameResult->first()->totalWins : 0 }}</h1>
+                                    <h1>Lose : {{ $activeGame->team->gameResult->isNotEmpty() ? $activeGame->team->gameResult->first()->totalLosses : 0 }}</h1>
+
+                                    {{-- <h1>Win : {{ $activeGame->team->gameResult->first()->totalWins }}</h1>|
+                                    <h1>Lose : {{ $activeGame->team->gameResult->first()->totalLosses }}</h1> --}}
                                 </div>
                             </div>
                     </div>
@@ -79,8 +83,10 @@
                             <h1>{{ $enemyTeam->team->team_name }}</h1>
                             <h1 class="text-sm">Players : {{ count($enemyTeam->team->players) }}</h1>
                             <div class="flex gap-2 bg-slate-100 justify-end text-sm">
-                                <h1>Win : {{ count($activeGame->team->players) }}</h1>|
-                                <h1>Lose : {{ count($activeGame->team->players) }}</h1>
+                                {{-- <h1>Win : {{ $enemyTeam->team->gameResult->first()->totalWins }}</h1>| --}}
+                                <h1>Win : {{ $enemyTeam->team->gameResult->isNotEmpty() ? $enemyTeam->team->gameResult->first()->totalWins : 0 }}</h1>
+                                <h1>Lose : {{ $enemyTeam->team->gameResult->isNotEmpty() ? $enemyTeam->team->gameResult->first()->totalLosses : 0 }}</h1>
+                                {{-- <h1>Lose : {{ $enemyTeam->team->gameResult->first()->totalLosses }}</h1> --}}
                             </div>
                         </div>
                         <img class="w-[70px] h-[70px]" src="{{ asset('storage').'/'.$enemyTeam->team->profile }}" alt="" srcset="">
@@ -139,7 +145,7 @@
             let error = @json(session('error'));
             let success = @json(session('success'));
             let playerScores = @json($activeGame->team->players);
-            console.log(playerScores)
+            // console.log(playerScores)
             $(document).ready(function(){
                 if(error){
                     sweetAlert('Score Error!','Score is required!','error')
@@ -168,17 +174,21 @@
 
             //get the player total score
             const playerTotalScore = (pScore,id) => {
+                console.log(pScore)
                 pScore.forEach(ts => {
-                    console.log(ts.player_total_score)
+                    
                     if(ts.player_total_score != null){
                         if(ts.player_total_score.player_id == parseInt(id)){
+                            console.log(ts.player_total_score)
                         // console.log(ts.player_total_score.total_score)
                         //  ts.player_total_score.total_score;
                             $('#player_total_score').val(ts.player_total_score.total_score);
                             $('#total_score_id').val(ts.player_total_score.id)
-                        }
-                    }else{
-                        $('#player_total_score').attr('readonly', true)
+                            $('#player_total_score').attr('readonly', false)
+                        }else{
+                            // $('#player_total_score').val(0);
+                            $('#player_total_score').attr('readonly', true)
+                    }
                     }
                     
                     

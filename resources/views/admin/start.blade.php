@@ -84,8 +84,15 @@
                                 </div>
 
                                 <div class="bg-slate-50 col-span-3 p-2">
-                                    <h1 class="uppercase font-semibold">Candidates Leading in Votes</h1>
-                                    <div class="h-[200px] overflow-y-auto">
+                                    <div class="flex justify-between items-center">
+                                        <h1 class="uppercase font-semibold">Candidates Leading in Votes</h1>
+                                        <span id="overallPrint" class="bg-red-500 p-1 text-white rounded-sm hover:cursor-pointer hover:bg-red-700">Print Overall</span>
+                                    </div>
+                                    <div class="h-[200px] overflow-y-auto" id="overAllContent">
+                                        <div class="bg-green-500 text-white p-2 text-center md:hidden">
+                                            <h1 class="text-2xl tracking-wider">Overall Result's</h1>
+                                            <span>Date and Time: {{ now()->format('F j, Y, g:i A') }}</span>
+                                        </div>
                                         <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 bg-white">
                                             <thead
                                                 class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -139,12 +146,12 @@
                                                             </div>
                                                         </td> --}}
                                                         <td class="p-4">
-                                                            <div class="flex items-center">
+                                                            <div class="flex items-center font-bold {{ $candidate->vote_results['total'] > 80 ? 'text-green-500' : 'text-red-500' }}">
                                                                 {{ $candidate->vote_results['total'] }}%
                                                             </div>
                                                         </td>
                                                         <td class="p-4">
-                                                            <div class="flex items-center">
+                                                            <div class="flex items-center font-bold text-green-500">
                                                                 {{ __('100%') }}
                                                             </div>
                                                         </td>
@@ -176,7 +183,10 @@
                                             </div>
 
                                             <div>
+                                                @if ($category->status)
                                                 <a data-category="{{ $category->id }}" href="#" class="printResult text-blue-500 px-1 rounded-md hover:text-blue-700"><i class="fa-solid fa-print"></i></a>
+                                                @endif
+                                                
                                                 <a data-category="{{ $category->id }}" href="#" class="editCategory text-blue-500 px-1 rounded-md hover:text-blue-700"><i class="fa-solid fa-pen-to-square"></i></a>
                                             </div>
                                         </h1>
@@ -214,7 +224,7 @@
                 </div>
             </div>
         </div>
-
+        {{-- @include('admin.popup.status', ['status'=>session('status')]) --}}
         @if (session('status'))
             @include('admin.popup.status', ['status'=>session('status')])
         @endif
@@ -227,11 +237,22 @@
         @section('scripts')
             <script>
                 let dataToPrint = @json($dataToPrint);
-                console.log(dataToPrint)
+                let leadingCandidatesPerCat = @json($leadingCandidatesForCategory);
+
+                console.log(leadingCandidatesPerCat)
+                leadingCandidatesPerCat = leadingCandidatesPerCat.sort((a, b) => {
+                    // Check if percentage_scores and percentage_scores[0] are defined and provide default values if not
+                    const a_total = (a.percentage_scores && a.percentage_scores[0] && a.percentage_scores[0].total_percentage) || 0;
+                    const b_total = (b.percentage_scores && b.percentage_scores[0] && b.percentage_scores[0].total_percentage) || 0;
+
+                    return b_total - a_total;
+                });
+                // console.log(leadingCandidatesPerCat)
                 $(document).ready(function(){
                     //debug
                     // $('#printModalGame').trigger('click')
                     $('#statusCloseBtn').click(function(){
+                        // alert('yes')
                         $('#statusBackdrop').addClass('hidden')
                         $('#statusModal').addClass('hidden')
                     })
@@ -279,21 +300,86 @@
                     //print result
                     $('.printResult').click(function(){
                         let id = $(this).data('category')
+
+                        //leading
+                        let renderLeading = ''
+                        let path = "{{ asset('storage') }}"
+                        leadingCandidatesPerCat.forEach(l => {
+                            console.log(l)
+                            renderLeading += `
+                                <div class="shadow text-center px-2 flex gap-2 bg-white">
+                                    <img class="w-[50px]" src="${path}/${l.profile}" alt="">
+                                    <div class="">
+                                        <span class="text-xs font-bold">${l.name}</span>
+                                        <span class="block uppercase text-sm font-bold ${l.percentage_scores[0].total_percentage >= 80 ? 'text-green-500' : 'text-red-500'}">
+                                            ${l.percentage_scores[0].total_percentage}%
+                                        </span>    
+                                    </div>
+                                </div> 
+                            `
+                        });
+
+                        $('#renderVoteCategoryLeadingResult').html(renderLeading)
                         // alert(id)
                         dataToPrint.forEach(d => {
                             if(d.id == id){
                                 // console.log(d)
                                 let renderData = ''
                                 $('#selectedCategory').text(d.category_name)
+                                $('#selectedCategoryLeading').text(d.category_name)
 
-                                d.sub_category.forEach(s => {
+                                d.event.judge.forEach(j => {
+                                    // console.log(j)
+                                    let renderCandidates = ''
+                                    j.votes.forEach(v => {
+                                        let percentageScorePerJudge = 0;
+                                        v.candidate.percentage_scores.forEach(sc => {
+                                            // console.log(sc)
+                                            if(j.id === sc.judge_id){
+                                                percentageScorePerJudge = sc.total_score
+                                            }
+                                        });
+                                        renderCandidates += `
+                                            <div class="shadow text-center px-2 bg-white">
+                                                <span class="text-xs">${v.candidate.name}</span>
+                                                <span class="block uppercase text-sm font-bold ${percentageScorePerJudge >= 40 ? 'text-green-500' : 'text-red-500'}">${percentageScorePerJudge}%</span>
+                                            </div>
+                                        `
+                                        
+                                    });
                                     renderData += `
-                                             
+                                    <div class="flex items-center gap-2 border border-slate-500 p-2">
+                                        <div class="shadow text-center px-2">
+                                            <span class="text-xs">Name:</span>
+                                            <span class="block uppercase text-sm font-bold">${j.name}</span>
+                                        </div>
+                                        
+                                        <div class="flex-1 flex gap-2 flex-wrap">
+                                            ${renderCandidates}
+                                        </div>
+                                        
+                                        <div class="shadow px-2 text-end">
+                                            <span class="text-xs mx-4">Signature</span>
+                                            <span class="block uppercase text-sm font-bold">____________</span>
+                                        </div>  
+                                    </div>   
                                     `
                                 });
+
+                                $('#renderVoteCategoryResult').html(renderData)
                                 $('#printModalGame').trigger('click')
                             }
                         });
+                    })
+
+                    //ttigger print
+                    $('#printNow').click(function(){
+                        PrintDiv()
+                    })
+
+                    //overall print
+                    $('#overallPrint').click(function(){
+                        PrintDivOverall()
                     })
 
                     $('#editCloseBtn').click(function(){
@@ -326,6 +412,59 @@
                             }
                         });
                     });
+                }
+
+                const PrintDiv = ()=> {
+                    var contents = document.getElementById("contents").innerHTML;
+                    var frame1 = document.createElement('iframe');
+                    frame1.name = "frame1";
+                    frame1.style.position = "absolute";
+                    frame1.style.top = "-1000000px";
+                    document.body.appendChild(frame1);
+                    var frameDoc = (frame1.contentWindow) ? frame1.contentWindow : (frame1.contentDocument.document) ? frame1.contentDocument.document : frame1.contentDocument;
+                    frameDoc.document.open();
+                    frameDoc.document.write(`<html><head><title>DIV Contents</title>`);
+                        // Copy stylesheets from main document to iframe
+                        var styles = document.querySelectorAll('link[rel="stylesheet"]');
+                        styles.forEach(function(style) {
+                            frameDoc.document.write(style.outerHTML);
+                        });
+                    frameDoc.document.write('</head><body>');
+                    frameDoc.document.write(contents);
+                    frameDoc.document.write('</body></html>');
+                    frameDoc.document.close();
+                    setTimeout(function () {
+                        window.frames["frame1"].focus();
+                        window.frames["frame1"].print();
+                        document.body.removeChild(frame1);
+                    }, 500);
+                    return false;
+                }
+                const PrintDivOverall = ()=> {
+                    var contents = document.getElementById("overAllContent").innerHTML;
+                    var frame1 = document.createElement('iframe');
+                    frame1.name = "frame1";
+                    frame1.style.position = "absolute";
+                    frame1.style.top = "-1000000px";
+                    document.body.appendChild(frame1);
+                    var frameDoc = (frame1.contentWindow) ? frame1.contentWindow : (frame1.contentDocument.document) ? frame1.contentDocument.document : frame1.contentDocument;
+                    frameDoc.document.open();
+                    frameDoc.document.write(`<html><head><title>DIV Contents</title>`);
+                        // Copy stylesheets from main document to iframe
+                        var styles = document.querySelectorAll('link[rel="stylesheet"]');
+                        styles.forEach(function(style) {
+                            frameDoc.document.write(style.outerHTML);
+                        });
+                    frameDoc.document.write('</head><body>');
+                    frameDoc.document.write(contents);
+                    frameDoc.document.write('</body></html>');
+                    frameDoc.document.close();
+                    setTimeout(function () {
+                        window.frames["frame1"].focus();
+                        window.frames["frame1"].print();
+                        document.body.removeChild(frame1);
+                    }, 500);
+                    return false;
                 }
             </script>
         @endsection

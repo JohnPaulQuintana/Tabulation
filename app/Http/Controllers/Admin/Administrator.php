@@ -9,6 +9,7 @@ use App\Models\Event;
 use App\Models\Game;
 use App\Models\GameResult;
 use App\Models\Judge;
+use App\Models\PercentageScore;
 use App\Models\Player;
 use App\Models\PlayerTotalScore;
 use App\Models\Scorer;
@@ -34,37 +35,59 @@ class Administrator extends Controller
 
         $activeEvents = Event::where('status',1)->first();
         $categoriesChart = [];
+        $categoriesChartLoss = [];
         $teams = [];
-        
+        $type = '';
         if($activeEvents && $activeEvents->type === 'sport'){
+            $type = 'sport';
             // Retrieve all categories
-            $categories = SportCategory::get();
-            // Iterate over each category
-            foreach ($categories as $category) {
-                $categoriesChart[] = ['x' => $category->category, 'y' => random_int(10,100)];
-                // // dd($category);
-                // // Fetch game results related to the current sport category
-                $gameResults = GameResult::with('team')->where('sport_category_id', $category->id)->get();
-                // dd($gameResults);
-                // Add data to the categories chart and teams arrays
-                foreach ($gameResults as $gameResult) {
-                    // if(){
-                        // $categoriesChartTeam1[] = ['x' => $category->category, 'y' => ($gameResult->result=='win'? random_int(10,100) : random_int(5,30))];
-                        // $teams[] = ['t' => $gameResult->team->team_name];
-                    // }
-                    
+            $teams = Team::with(['gameResult'=>function($query){
+                $query->selectRaw('team_id, SUM(CASE WHEN result = "win" THEN 1 ELSE 0 END) as totalWins, SUM(CASE WHEN result = "lose" THEN 1 ELSE 0 END) as totalLoss')
+                ->groupBy('team_id'); 
+            }])->get();
+            // Sort the collection in descending order based on totalPercentage
+            $teams = $teams->sortByDesc(function ($team) {
+                return $team->gameResult->first()->totalWins ?? 0;
+            });
+            
+            foreach ($teams as $team) {
+                // dd(count($team->gameResult));
+                // dd($team->gameResult);
+                if(count($team->gameResult)>0){
+                    $categoriesChart[] = ['x' => $team->team_name, 'y' => $team->gameResult->first()->totalWins];
+                    $categoriesChartLoss[] = ['x' => $team->team_name, 'y' => $team->gameResult->first()->totalLoss];
                 }
             }
+           
             // dd($categoriesChart, $teams);
         }else{
+            $type = 'cultural';
             // Retrieve all categories
-            $categories = Category::get();
-            // dd($categories);
-            foreach ($categories as $category) {
-                $categoriesChart[] = ['x' => $category->category_name, 'y' => random_int(10,100)];
+            $categories = category::get();
+            $teams = Candidate::with(['percentageScores'=>function($query){
+                $query->selectRaw('candidate_id, SUM(total_score) as totalPercentage')
+                ->groupBy('candidate_id');  
+            }])
+            ->get();
+
+            // Sort the collection in descending order based on totalPercentage
+            $teams = $teams->sortByDesc(function ($team) {
+                return $team->percentageScores->first()->totalPercentage ?? 0;
+            });
+
+            // dd($teams);
+
+            $categoriesCount = count($categories); // Assuming $categories is defined and is an array
+
+            foreach ($teams as $team) {
+                $totalScore = $team->percentageScores->first()->totalPercentage ?? 0;
+                // dd($team->percentageScores->first());
+                $percentage = $categoriesCount > 0 ? $totalScore / $categoriesCount : 0;
+                $categoriesChart[] = ['x' => $team->name, 'y' => number_format($percentage, 1)];
             }
+            // dd($categoriesChart);
         }
-        return view('admin.index', compact('events', 'candidates', 'judges', 'categories', 'activeEvents','categoriesChart','teams'));
+        return view('admin.index', compact('events', 'candidates', 'judges', 'categories', 'activeEvents','categoriesChart','categoriesChartLoss','teams','type'));
         // return view('admin.index', compact('events', 'candidates', 'judges', 'categories', 'activeEvents'));
     }
 
@@ -89,7 +112,7 @@ class Administrator extends Controller
             'event_address' => 'required',
             'event_details' => 'required',
             'event_time' => 'required',
-            'event_date' => 'required',
+            'event_date' => 'required|date|after_or_equal:today',
             'event_type' => 'required',
             'event_image' => 'required|image',  // Ensure it's an image
             // 'categories' => 'required|array|min:1',
@@ -183,7 +206,11 @@ class Administrator extends Controller
             "sub_categories" => 'required|array',
             "percentage" => 'required|array',
         ]);
-
+        $totalPercentage = array_sum($validated['percentage']);
+        // dd($totalPercentage);
+        if($totalPercentage > 100 || $totalPercentage < 100){
+            return Redirect::route('admin.category', $request->event_id)->with(['limit_category' => 'error', 'event_id' => $request->event_id, 'message' => 'Category is successfully added!']);
+        }
 
         $category = Category::create([
             'event_id' => $request->event_id,
@@ -208,6 +235,18 @@ class Administrator extends Controller
         }
 
         return Redirect::route('admin.category', $request->event_id)->with(['save_category' => 'success', 'event_id' => $request->event_id, 'message' => 'Category is successfully added!']);
+    }
+
+    //destroy category
+    public function categoryDestroy(Request $request){
+        // dd($request->id);
+        $category = Category::find($request->id);
+        $eventID = $category->event_id;
+        // dd($category);
+        if($category){
+            $category->delete();
+            return Redirect::route('admin.category', $eventID)->with(['delete_category' => 'success', 'event_id' => $eventID, 'message' => 'Category is successfully deleted!']);
+        }
     }
 
     //judge
@@ -345,13 +384,30 @@ class Administrator extends Controller
     //start the event
     public function startEvent(Request $request)
     {
-        //printing process
-        $dataToPrint = Category::with(['event.judge.votes','subCategory'])->get();
-        // dd($dataToPrint);
-
+        
+        $actEvent = Event::where('status',1)->first();
         $activeCategory = Category::with('subCategory')->where('status', true)->first();
+        // dd($activeCategory);
+        if($actEvent && $activeCategory != null){
+            //printing process
+            $dataToPrint = Category::with(['event.judge.votes.candidate.percentageScores','subCategory'])->get();
+            //LEading candidates
+            $leadingCandidatesForCategory = Candidate::with(['percentageScores'=>function($query) use($activeCategory){
+                $query->selectRaw('candidate_id, SUM(total_score) as total_percentage')
+                ->where('category_id', $activeCategory->id)
+                ->groupBy('candidate_id');
+            }])
+                ->where('event_id', $actEvent->id)
+                ->get();
+            // dd($leadingCandidatesForCategory);
+        }else{
+            $dataToPrint = [];
+            $leadingCandidatesForCategory = [];
+        }
+
         if (!$activeCategory) {
             $activeCategory = Category::with('subCategory')->where('status', false)->first();
+            
         }
 
         $activeEvents = Event::with([
@@ -371,7 +427,7 @@ class Administrator extends Controller
             $candidate->vote_results = $votePerCandidates;
         }
         // dd($activeEvents);
-        return view('admin.start', compact('activeEvents', 'activeCategory', 'dataToPrint'));
+        return view('admin.start', compact('activeEvents', 'activeCategory', 'dataToPrint', 'leadingCandidatesForCategory'));
     }
 
     //update the event status
@@ -501,7 +557,7 @@ class Administrator extends Controller
             'event_address' => 'required',
             'event_details' => 'required',
             'event_time' => 'required',
-            'event_date' => 'required',
+            'event_date' => 'required|date|after_or_equal:today',
             'event_type' => 'required',
             'event_image' => 'required|image',  // Ensure it's an image
             // 'categories' => 'required|array|min:1',
@@ -555,6 +611,9 @@ class Administrator extends Controller
     public function team(Request $request){
         // dd($request->id);
         $team = Team::with('players')->find($request->id);
+
+        //all teams
+        // $teams = Team::with('players')
         // dd($team);
         return view('admin.sport.team', compact('team'));
     }
@@ -588,6 +647,47 @@ class Administrator extends Controller
         }
 
         return Redirect::route('admin.sports.team', $request->team_id)->with(['success'=>'success', 'message'=>'Team profile successfully updated!']);
+    }
+
+    //update player
+    public function updatePlayer(Request $request){
+        // dd($request);
+
+        if(empty($request->update_player_name)){
+            return Redirect::route('admin.sports.team', $request->team_id)->with(['success'=>'error','title'=>'Update Failed', 'message'=>"Player name is required!"]);
+        }
+        // Find the player by ID
+        $player = Player::find($request->update_player_id);
+        // Check if team_image file is present
+        if ($request->hasFile('update_player_profile')) {
+            // Store the file and get the path
+            $path = $request->file('update_player_profile')->store('player_profile', 'public');
+
+            // Update the team record with the image path
+            $player->update([
+                'name' => $request->update_player_name,
+                'profile' => $path,
+            ]);
+        } else {
+            // Update only the team name if image is not present
+            $player->update([
+                'name' => $request->update_player_name,
+            ]);
+        }
+
+        return Redirect::route('admin.sports.team', $request->team_id)->with(['success'=>'success','title'=>'Update Success', 'message'=>"Player successfully updated!"]);
+    }
+
+    //destro player
+    public function destroyPlayer(Request $request){
+        // dd($request->id);
+        $player = Player::find($request->id);
+        $team_id = $player->team_id;
+        if($player){
+            $player->delete();
+            return Redirect::route('admin.sports.team', $team_id)->with(['success'=>'success','title'=>'Delete Success', 'message'=>"Player is no longer available on the system!"]);
+        }
+        // dd($team_id);
     }
 
     //store player
@@ -650,14 +750,26 @@ class Administrator extends Controller
     //game start
     public function game(Request $request){
         // dd($request->id);
-        $sport = Event::with(['judge','teams','sportsCategories.game'=> function($q){
-            $q->where('status', 'ongoing');
+        $sport = Event::with(['judge','teams','sportsCategories'=> function($q){
+            $q->whereDoesntHave('game');
         }])->find($request->id);
         // dd($sport);
 
-        $inGame = Game::with(['sportCategory','team.players.playerTotalScore', 'team.scorer.judge'])->where('status','active')->get();
-
-        $activeGame = Game::with(['team.players.playerTotalScore', 'team.players.playerScore'])->where('status','active')->get();
+        $inGameCopy= Game::with(['sportCategory','team.players.playerTotalScore', 'team.scorer'])->where('status','active')->get();
+        
+        // dd($inGameCopy);
+        // if($inGameCopy->isNotEmpty()){
+            $inGame = Game::with(['sportCategory','team.players.playerTotalScore', 'team.scorer'=>function($query) use($inGameCopy){
+                $query->with(['judge'])->whereIn('game_id',$inGameCopy->pluck('id'));
+            }])->where('status','active')->get();
+        // }
+        $activeGame = Game::with([
+            'team.gameResult'=>function($query){
+                $query->selectRaw('team_id, SUM(CASE WHEN result = "win" THEN 1 ELSE 0 END) as totalWins, SUM(CASE WHEN result = "lose" THEN 1 ELSE 0 END) as totalLoss')
+                ->groupBy('team_id'); 
+            },
+            'team.players.playerTotalScore', 
+            'team.players.playerScore'])->where('status','active')->get();
         // dd($activeGame);
         $teamGameResultsCount = SportCategory::with(['gameResults'])->whereHas('gameResults')->get();
         // $gameCategory = SportCategory::get();
@@ -666,17 +778,37 @@ class Administrator extends Controller
         if($activeGame && $activeGame->count() >= 2){
             // dd($activeGame[0]->team);
             $firstTeam = $activeGame[0]->team;
+            $this->filterPlayerScores($firstTeam, $activeGame[0]->id);
+            
             $secondTeam = $activeGame[1]->team;
-            // $playerScore = 
+            $this->filterPlayerScores($secondTeam, $activeGame[1]->id);
+            
         }else{
             // Initialize variables
             $firstTeam = null;
             $secondTeam = null;
         }
-        
-        // dd($activeGame);
-        return view('admin.game.game', compact('sport', 'inGame', 'activeGame','firstTeam','secondTeam','teamGameResultsCount'));
 
+        //print results
+        // $printCategoryResultCopy = SportCategory::with(['gameResults'])->whereHas('gameResults')->get();
+        // dd($printCategoryResultCopy);
+        $printCategoryResults = SportCategory::with(['gameResults.team.players.playerScore'])->whereHas('gameResults')->get();
+
+        
+        // dd($printCategoryResults);
+        return view('admin.game.game', compact('sport', 'inGame', 'activeGame','firstTeam','secondTeam','teamGameResultsCount', 'printCategoryResults'));
+
+    }
+
+    private function filterPlayerScores($team, $activeGameId){
+        foreach ($team->players as $player) {
+           // Filter out scores that do not match the active game ID
+            $filteredScores = $player->playerScore->filter(function ($score) use ($activeGameId) {
+                return $score->game_id === $activeGameId;
+            });
+            // Update the relationship with the filtered scores
+            $player->setRelation('playerScore', $filteredScores);
+        }
     }
 
     //end game

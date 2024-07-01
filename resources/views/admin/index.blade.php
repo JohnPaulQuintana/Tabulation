@@ -18,45 +18,45 @@
 
                 {{-- card --}}
                 <div
-                    class="max-w-12xl mx-auto sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-2 mb-2">
+                    class="max-w-12xl mx-auto sm:px-6 lg:px-2 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-2 mb-2">
                     {{-- {{ $events }} --}}
-                    <div class="shadow flex justify-center items-center gap-10 rounded-md p-2 py-5">
-                        <div class="text-5xl text-slate-800">
+                    <div class="shadow flex justify-center items-center gap-10 rounded-md p-2">
+                        <div class="text-3xl text-slate-800">
                             <i class="fa-solid fa-calendar-check"></i>
                         </div>
                         <div class="text-center text-md">
-                            <span class="block font-bold text-5xl text-slate-800">0{{ count($events) }}</span>
-                            <span>Total of Events</span>
+                            <span class="block font-bold text-3xl text-slate-800">0{{ count($events) }}</span>
+                            <span class="text-sm">Total of Events</span>
                         </div>
                     </div>
 
-                    <div class="shadow flex justify-center items-center gap-10 rounded-md p-2 py-5">
-                        <div class="text-5xl text-slate-800">
+                    <div class="shadow flex justify-center items-center gap-10 rounded-md p-2">
+                        <div class="text-3xl text-slate-800">
                             <i class="fa-solid fa-users-rectangle"></i>
                         </div>
                         <div class="text-center text-md">
-                            <span class="block font-bold text-5xl text-slate-800">0{{ count($candidates) }}</span>
-                            <span>Total of Candidates</span>
+                            <span class="block font-bold text-3xl text-slate-800">0{{ count($candidates) }}</span>
+                            <span class="text-sm">Total of Candidates</span>
                         </div>
                     </div>
 
-                    <div class="shadow flex justify-center items-center gap-10 rounded-md p-2 py-5">
-                        <div class="text-5xl text-slate-800">
+                    <div class="shadow flex justify-center items-center gap-10 rounded-md p-2">
+                        <div class="text-3xl text-slate-800">
                             <i class="fa-solid fa-users-between-lines"></i>
                         </div>
                         <div class="text-center text-md">
-                            <span class="block font-bold text-5xl text-slate-800">0{{ count($judges) }}</span>
-                            <span>Total of Judges</span>
+                            <span class="block font-bold text-3xl text-slate-800">0{{ count($judges) }}</span>
+                            <span class="text-sm">Total of Judges</span>
                         </div>
                     </div>
 
-                    <div class="shadow flex justify-center items-center gap-10 rounded-md p-2 py-5">
-                        <div class="text-5xl text-slate-800">
+                    <div class="shadow flex justify-center items-center gap-10 rounded-md p-2">
+                        <div class="text-3xl text-slate-800">
                             <i class="fa-solid fa-layer-group"></i>
                         </div>
                         <div class="text-center text-md">
-                            <span class="block font-bold text-5xl text-slate-800">0{{ count($categories) }}</span>
-                            <span>Total of Categories</span>
+                            <span class="block font-bold text-3xl text-slate-800">0{{ count($categories) }}</span>
+                            <span class="text-sm">Total of Categories</span>
                         </div>
                     </div>
 
@@ -66,13 +66,14 @@
                     <span class="text-sm md:text-xl lg:text-xl">Statistics of tabulation</span>
                 </div>
 
-                <div class="max-w-12xl mx-auto sm:px-6 lg:px-8 mb-2 grid grid-cols-2 gap-2">
-                    <div>
-                        @include('admin.chart.pie')
-                    </div>
+                <div class="max-w-12xl mx-auto sm:px-6 lg:px-8 mb-2 grid gap-2">
                     <div>
                         @include('admin.chart.chart')
                     </div>
+                    <div>
+                        @include('admin.chart.pie')
+                    </div>
+                    
                 </div>
 
             </div>
@@ -86,80 +87,32 @@
                 let pieChartDatas = @json($events);
                 let events = @json($activeEvents);
                 let categories = @json($categoriesChart);
+                let categoriesLoss = @json($categoriesChartLoss);
                 let Teams = @json($teams);
+                let Type = @json($type);
                
-                console.log(categories)
+                // console.log(categoriesLoss)
                 $('#title').text(events.name)
                 $('#sub-title').text(events.details)
                 // bar chart
                 const options = {
                     colors: ["#1A56DB", "#FDBA8C"],
-                    series: [{
-                            name: "Win",
+                    series: Type === 'sport' ? [
+                        {
+                            name: Type === 'sport' ? 'Team Win' : "Overall Percentage",
                             color: "#1A56DB",
-                            // data: [{
-                            //         x: "Monw",
-                            //         y: 231
-                            //     },
-                            //     {
-                            //         x: "Tue",
-                            //         y: 122
-                            //     },
-                            //     {
-                            //         x: "Wed",
-                            //         y: 63
-                            //     },
-                            //     {
-                            //         x: "Thu",
-                            //         y: 421
-                            //     },
-                            //     {
-                            //         x: "Fri",
-                            //         y: 122
-                            //     },
-                            //     {
-                            //         x: "Sat",
-                            //         y: 323
-                            //     },
-                            //     {
-                            //         x: "Sun",
-                            //         y: 111
-                            //     },
-                            // ],
                             data: categories,
                         },
                         {
-                            name: "Lose",
-                            color: "#FDBA8C",
-                            // data: [{
-                            //         x: "Mon",
-                            //         y: 232
-                            //     },
-                            //     {
-                            //         x: "Tue",
-                            //         y: 113
-                            //     },
-                            //     {
-                            //         x: "Wed",
-                            //         y: 341
-                            //     },
-                            //     {
-                            //         x: "Thu",
-                            //         y: 224
-                            //     },
-                            //     {
-                            //         x: "Fri",
-                            //         y: 522
-                            //     },
-                            //     {
-                            //         x: "Sat",
-                            //         y: 411
-                            //     },
-                            //     {
-                            //         x: "Sun",
-                            //         y: 243
-                            //     },
-                            // ],
+                            name: Type === 'sport' ? 'Team Loss' : "Overall Percentage",
+                            color: "#FF0000",
+                            data: categoriesLoss,
+                        },
+                        
+                    ] : [
+                        {
+                            name: Type === 'sport' ? 'Team Win' : "Overall Percentage",
+                            color: "#1A56DB",
                             data: categories,
                         },
                     ],
@@ -174,9 +127,9 @@
                     plotOptions: {
                         bar: {
                             horizontal: false,
-                            columnWidth: "70%",
+                            columnWidth: "50%",
                             borderRadiusApplication: "end",
-                            borderRadius: 8,
+                            borderRadius: 2,
                         },
                     },
                     tooltip: {
@@ -200,7 +153,7 @@
                         colors: ["transparent"],
                     },
                     grid: {
-                        show: false,
+                        show: true,
                         strokeDashArray: 4,
                         padding: {
                             left: 2,
@@ -209,12 +162,15 @@
                         },
                     },
                     dataLabels: {
-                        enabled: false,
+                        enabled: true,
                     },
                     legend: {
-                        show: false,
+                        show: true,
                     },
                     xaxis: {
+                        title: {
+                            text: 'Participants on the Event'
+                        },
                         floating: false,
                         labels: {
                             show: true,
@@ -231,7 +187,17 @@
                         },
                     },
                     yaxis: {
-                        show: false,
+                        title: {
+                            text: Type === 'sport' ? 'Team Winning Records' : 'Overall Percentage'
+                        },
+                        show: true,
+                        min: Type === 'sport' ? 0 : 10,
+                        max: Type === 'sport' ? 10 : 100,
+                        labels: {
+                            formatter: function (value) {
+                                return value
+                            }
+                        }
                     },
                     fill: {
                         opacity: 1,

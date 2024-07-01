@@ -21,7 +21,7 @@
                 <div class="max-w-12xl mx-auto sm:px-6 lg:px-8 mb-2">
 
 
-                    <div class="relative overflow-x-auto sm:rounded-lg p-2 bg-slate-100">
+                    <div class="relative overflow-x-auto sm:rounded-lg p-2 bg-slate-100 h-[400px]">
                         <div
                             class="p-2 flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900">
                             <span>Created Event's</span>
@@ -44,44 +44,38 @@
                                     </button>
                                     <!-- Dropdown menu -->
                                     <div id="dropdownAction"
-                                        class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
+                                        class="z-[9999] hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
                                         <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
                                             aria-labelledby="dropdownActionButton">
-                                            <li class="hover:bg-slate-100 p-4">
+                                            <li data-event_id="0" class="hover:bg-slate-100 p-4 filterEventId">
                                                 <a href="#" class="flex items-center px-2">
-                                                    <div class="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div>
-                                                    Online Event's
+                                                    <div class="h-2.5 w-2.5 rounded-full bg-red-500 me-2"></div>
+                                                    <i class="fa-solid fa-share-all text-xl"></i>
+                                                    {{-- <img class="w-[25px]" src="{{ asset('storage').'/'.$event->image }}" alt="" srcset=""> --}}
+                                                    <span>{{ __('Display all') }}</span>
+                                                    
                                                 </a>
                                             </li>
-                                            <li class="hover:bg-slate-100 p-4">
-                                                <a href="#" class="flex items-center px-2">
-                                                    <div class="h-2.5 w-2.5 rounded-full bg-red-500 me-2"></div> Offline
-                                                    Event's
-                                                </a>
-                                            </li>
+                                            @foreach ($events as $event)
+                                                <li data-event_id="{{ $event->id }}" class="hover:bg-slate-100 p-4 filterEventId">
+                                                    <a href="#" class="flex items-center px-2">
+                                                        <div class="h-2.5 w-2.5 rounded-full {{ $event->status === 1 ? 'bg-green-500' : 'bg-red-500'}} me-2"></div>
+                                                        <img class="w-[25px]" src="{{ asset('storage').'/'.$event->image }}" alt="" srcset="">
+                                                        <span class="text-xs">{{ $event->name }}</span>
+                                                        
+                                                    </a>
+                                                </li>
+                                            @endforeach
 
 
                                         </ul>
 
                                     </div>
                                 </div>
-                                <label for="table-search" class="sr-only">Search</label>
-                                <div class="relative">
-                                    <div
-                                        class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
-                                        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
-                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                                stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                                        </svg>
-                                    </div>
-                                    <input type="text" id="table-search-users"
-                                        class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        placeholder="Search for users">
-                                </div>
+                                
                             </div>
                         </div>
-                        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                        <table id="eventTable"  class="text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                             <thead
                                 class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
@@ -125,6 +119,7 @@
                                 {{-- {{ $events }} --}}
                                 @foreach ($events as $ev)
                                     <tr
+                                        data-event_id="{{ $ev->id }}"
                                         class="bg-white border-b border-slate-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-slate-100 dark:hover:bg-gray-600">
                                         {{-- <td class="w-4 p-4">
                                             <div class="flex items-center">
@@ -138,7 +133,7 @@
                                             <img class="w-10 h-10 rounded-sm"
                                                 src="{{ asset('storage').'/'.$ev->image }}" alt="Jese image">
                                             <div class="ps-3">
-                                                <div class="text-base font-semibold">{{ $ev->name }}</div>
+                                                <div class="text-sm font-semibold">{{ $ev->name }}</div>
                                                 <div class="font-normal text-gray-500">Santiago City</div>
                                             </div>
                                         </th>
@@ -205,12 +200,27 @@
     @section('scripts')
         <script>
             $(document).ready(function(){
+                $('.filterEventId').click(function(){
+                    filterTable($(this).data('event_id'))
+                })
+                
                 $('#modalCloseBtn').click(function(){
                     // alert('dwadwad')
                     $('#modalBackdrop').addClass('hidden')
                     $('#successModal').addClass('hidden')
                 })
             })
+
+            const filterTable = (filter) => {
+                $('#eventTable tbody tr').each(function() {
+                    const rowId = $(this).data('event_id');
+                    if(filter === 0 || rowId === filter){
+                        $(this).show();
+                    }else{
+                        $(this).hide();
+                    }
+                })
+            }
         </script>
     @endsection
 </x-app-layout>

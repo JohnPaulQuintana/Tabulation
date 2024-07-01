@@ -47,26 +47,40 @@
                                         class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
                                         <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
                                             aria-labelledby="dropdownActionButton">
-                                            <li class="hover:bg-slate-100 p-4">
+                                            <li data-event_id="0" class="hover:bg-slate-100 p-4 filterEventId">
                                                 <a href="#" class="flex items-center px-2">
-                                                    <div class="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div>
-                                                    Active Sport's
+                                                    <div class="h-2.5 w-2.5 rounded-full bg-red-500 me-2"></div>
+                                                    <i class="fa-solid fa-share-all text-xl"></i>
+                                                    {{-- <img class="w-[25px]" src="{{ asset('storage').'/'.$event->image }}" alt="" srcset=""> --}}
+                                                    <span>{{ __('Display all') }}</span>
+                                                    
                                                 </a>
                                             </li>
-                                            <li class="hover:bg-slate-100 p-4">
+                                            @foreach ($events as $event)
+                                                <li data-event_id="{{ $event->id }}" class="hover:bg-slate-100 p-4 filterEventId">
+                                                    <a href="#" class="flex items-center px-2">
+                                                        <div class="h-2.5 w-2.5 rounded-full {{ $event->status === 1 ? 'bg-green-500' : 'bg-red-500'}} me-2"></div>
+                                                        <img class="w-[25px]" src="{{ asset('storage').'/'.$event->image }}" alt="" srcset="">
+                                                        <span>{{ $event->name }}</span>
+                                                        
+                                                    </a>
+                                                </li>
+                                            @endforeach
+                                            
+                                            {{-- <li class="hover:bg-slate-100 p-4">
                                                 <a href="#" class="flex items-center px-2">
                                                     <div class="h-2.5 w-2.5 rounded-full bg-red-500 me-2"></div>
                                                     InActive
                                                     Sport's
                                                 </a>
-                                            </li>
+                                            </li> --}}
 
 
                                         </ul>
 
                                     </div>
                                 </div>
-                                <label for="table-search" class="sr-only">Search</label>
+                                {{-- <label for="table-search" class="sr-only">Search</label>
                                 <div class="relative">
                                     <div
                                         class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -79,10 +93,10 @@
                                     <input type="text" id="table-search-users"
                                         class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         placeholder="Search for users">
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
-                        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                        <table id="eventTable" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                             <thead
                                 class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
@@ -127,6 +141,7 @@
                                 {{-- {{ $sportd }} --}}
                                 @foreach ($events as $ev)
                                     <tr
+                                        data-event_id="{{ $ev->id }}"
                                         class="bg-white border-b border-slate-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-slate-100 dark:hover:bg-gray-600">
 
                                         <th scope="row"
@@ -216,6 +231,10 @@
             let cid = @json(session('category_id'));
             console.log(teams)
             $(document).ready(function() {
+
+                $('.filterEventId').click(function(){
+                    filterTable($(this).data('event_id'))
+                })
 
                 if (validation && modal) {
                     // alert("Category Name", 'This field is required!', 'error');
@@ -348,6 +367,17 @@
                 })
 
 
+            }
+
+            const filterTable = (filter) => {
+                $('#eventTable tbody tr').each(function() {
+                    const rowId = $(this).data('event_id');
+                    if(filter === 0 || rowId === filter){
+                        $(this).show();
+                    }else{
+                        $(this).hide();
+                    }
+                })
             }
             $('.closeModalCategoryEdit').click(function() {
                 window.location.reload()

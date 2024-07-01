@@ -188,10 +188,10 @@
             $(document).ready(function() {
                 let candidates = @json($event->candidates);
                 console.log(candidates)
-                $('#candidateCloseBtn').click(function(){
+                $('#editCandidateCloseBtn').click(function(){
                     // alert('dwadwad')
-                    $('#candidateBackdrop').addClass('hidden')
-                    $('#candidateModal').addClass('hidden')
+                    $('#editCandidateBackdrop').addClass('hidden')
+                    $('#editCandidateModal').addClass('hidden')
                 })
 
                 $('.editCandidate').click(function(){

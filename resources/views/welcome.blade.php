@@ -125,6 +125,16 @@
         }
     </style>
 
+    {{-- <style>
+        
+        .welcome{
+            font-style: italic;
+            color: red !important;
+            background: red;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+    </style> --}}
+
     {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
 </head>
 
@@ -230,10 +240,10 @@
                             <div class="row">
                                 <div class="col-md-5 offset-md-1">
                                     <div class="detail-box">
-                                        <h1>
+                                        <h1 id="welcome" class="welcome">
                                             Welcome to AMA Tabulation System
                                         </h1>
-                                        <p>
+                                        <p class="welcome">
                                             Our app is designed to streamline your tabulation process, offering you accurate and efficient results. Whether you're managing data, calculating scores, or organizing information, we've got you covered.
                                         </p>
                                         

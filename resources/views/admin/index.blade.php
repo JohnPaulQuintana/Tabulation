@@ -1,4 +1,14 @@
 <x-app-layout>
+
+    {{-- kapag wala to paki copy same sa pwesto kung nasaan --}}
+    @section('links')
+        <style>
+            /* #welcome{
+                color: red;
+            } */
+        </style>
+    @endsection
+
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Dashboard') }}

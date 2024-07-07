@@ -50,6 +50,12 @@
     {{-- <link rel="stylesheet" href="./node_modules/apexcharts/dist/apexcharts.css"> --}}
     @yield('links')
     
+    {{-- this is for sidebar --}}
+    {{-- <style>
+        .bago{
+            background: red;
+        }
+    </style> --}}
 </head>
 
 <body x-data="{ page: 'ecommerce', 'loaded': true, 'darkMode': true, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }" x-init="darkMode = JSON.parse(localStorage.getItem('darkMode'));

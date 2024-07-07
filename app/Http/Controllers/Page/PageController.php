@@ -13,5 +13,6 @@ class PageController extends Controller
         // dd($events);
         $online = Event::where('status', 1)->first();
         return view('welcome', compact('events','online'));
+        //welcome.blade.php
     }
 }

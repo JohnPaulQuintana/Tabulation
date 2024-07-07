@@ -60,6 +60,7 @@ Route::group(['middleware' => ['auth','verified']], function () {
         Route::post('/sports/store/player', [Administrator::class, 'storePlayer'])->name('sports.store.player');
         Route::post('/sports/update/player', [Administrator::class, 'updatePlayer'])->name('sports.update.player');
         Route::get('/sports/destroy/player/{id}', [Administrator::class, 'destroyPlayer'])->name('sports.destroy.player');
+        Route::get('/sports/destroy/scorer/{id}', [Administrator::class, 'destroyScorer'])->name('sports.destroy.scorer');
 
         //sport category
         Route::post('/sports/category', [Administrator::class, 'sportCategoryStore'])->name('sports.category');

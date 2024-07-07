@@ -187,7 +187,14 @@
         <script>
             $(document).ready(function() {
                 let candidates = @json($event->candidates);
-                console.log(candidates)
+                // console.log(candidates)
+
+                $('#candidateCloseBtn').click(function(){
+                    // alert('yes')
+                    $('#candidateBackdrop').addClass('hidden')
+                    $('#candidateModal').addClass('hidden')
+                })
+                
                 $('#editCandidateCloseBtn').click(function(){
                     // alert('dwadwad')
                     $('#editCandidateBackdrop').addClass('hidden')

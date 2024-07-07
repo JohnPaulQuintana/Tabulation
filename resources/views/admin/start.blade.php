@@ -239,7 +239,7 @@
                 let dataToPrint = @json($dataToPrint);
                 let leadingCandidatesPerCat = @json($leadingCandidatesForCategory);
 
-                console.log(leadingCandidatesPerCat)
+                // console.log(leadingCandidatesPerCat)
                 leadingCandidatesPerCat = leadingCandidatesPerCat.sort((a, b) => {
                     // Check if percentage_scores and percentage_scores[0] are defined and provide default values if not
                     const a_total = (a.percentage_scores && a.percentage_scores[0] && a.percentage_scores[0].total_percentage) || 0;
@@ -306,13 +306,16 @@
                         let path = "{{ asset('storage') }}"
                         leadingCandidatesPerCat.forEach(l => {
                             console.log(l)
+                            let l_total = (l.percentage_scores && l.percentage_scores[0] && l.percentage_scores[0].total_percentage) || 0;
+                            // const l_total = (b.percentage_scores && b.percentage_scores[0] && b.percentage_scores[0].total_percentage) || 0;
+
                             renderLeading += `
                                 <div class="shadow text-center px-2 flex gap-2 bg-white">
                                     <img class="w-[50px]" src="${path}/${l.profile}" alt="">
                                     <div class="">
                                         <span class="text-xs font-bold">${l.name}</span>
-                                        <span class="block uppercase text-sm font-bold ${l.percentage_scores[0].total_percentage >= 80 ? 'text-green-500' : 'text-red-500'}">
-                                            ${l.percentage_scores[0].total_percentage}%
+                                        <span class="block uppercase text-sm font-bold ${l_total >= 80 ? 'text-green-500' : 'text-red-500'}">
+                                            ${l_total}%
                                         </span>    
                                     </div>
                                 </div> 

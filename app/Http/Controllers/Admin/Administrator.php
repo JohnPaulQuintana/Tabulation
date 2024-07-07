@@ -690,6 +690,19 @@ class Administrator extends Controller
         // dd($team_id);
     }
 
+    //destro player
+    public function destroyScorer(Request $request){
+        // dd($request->id);
+        $scorer = Judge::find($request->id);
+        // dd($scorer);
+        $event_id = $scorer->event_id;
+        if($scorer){
+            $scorer->delete();
+            return Redirect::route('admin.judge', $event_id)->with(['judge-destroy' => 'success', 'message' => 'Judge has been deleted successfully.']);
+        }
+        // dd($team_id);
+    }
+
     //store player
     public function storePlayer(Request $request){
         // dd($request);

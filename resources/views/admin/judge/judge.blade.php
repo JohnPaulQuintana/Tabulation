@@ -175,8 +175,12 @@
                                         {{ $j->created_at }}
                                     </td>
                                     <td class="px-6 py-4 text-blue-500">
+                                        {{-- {{ $j }} --}}
                                         <a href="#" data-judge_id="{{ $j->id }}" class="editJudge">
                                             <i class="fa-solid fa-pen-to-square text-xl hover:text-blue-700"></i>
+                                        </a>
+                                        <a href="{{ route('admin.sports.destroy.scorer', $j->id) }}" class="">
+                                            <i class="fa-solid fa-square-minus text-xl text-red-500 hover:text-red-700"></i>
                                         </a>
                                     </td>
                                 </tr>
@@ -200,6 +204,15 @@
         <script>
             $(document).ready(function() {
                 let judges = @json($event->judge);
+                let deleted = @json(session('judge-destroy'));
+
+                if(deleted){
+                    Swal.fire({
+                        title: "Scorer Deleted!",
+                        text: "Scorer is successfully deleted!",
+                        icon: "success"
+                    });
+                }
                 // console.log(judges)
                 $('#judgeCloseBtn').click(function(){
                     $('#judgeBackdrop').addClass('hidden')

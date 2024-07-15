@@ -312,7 +312,7 @@ class JudgeController extends Controller
 
     //get notify 
     public function notifyJudge(){
-        $needtoShow = notifyUser::where('isShowed',1)->first();
+        $needtoShow = notifyUser::where('isShowed',1)->where('type','judge')->first();
         return response()->json(['data'=>$needtoShow]);
     }
     //update notify
@@ -324,5 +324,20 @@ class JudgeController extends Controller
         }
         // dd($needtoUpdate);
         // return response()->json(['data'=>$needtoShow]);
+    }
+    //request for edit
+    public function notifyJudgeModefied($userId, $candidateId, Request $request){
+        
+        $judge = Judge::find($userId);
+        $candidate = Candidate::find($candidateId);
+        $existedRequest = notifyUser::where('candidate_id',$candidateId)->where('isShowed', true)->first();
+        // dd($existedRequest);
+        if($existedRequest){
+            return Redirect::route('judge.candidates')->with(['requested'=>'error']);
+        }
+         //set notify
+         notifyUser::create(['name'=>$judge->name, 'profile'=>$judge->profile, 'isShowed'=>true, 'type'=>'admin', 'candidate_id'=>$candidate->id]);
+
+         return Redirect::route('judge.candidates')->with(['requested'=>'success']);
     }
 }

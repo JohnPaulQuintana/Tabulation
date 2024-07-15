@@ -956,9 +956,16 @@ class Administrator extends Controller
             $candidate->update(['isActive'=>true, 'counter'=>$request->counter]);
 
             //set notify
-            notifyUser::create(['name'=>$candidate->name, 'profile'=>$candidate->profile, 'isShowed'=>true]);
+            notifyUser::create(['name'=>$candidate->name, 'profile'=>$candidate->profile, 'isShowed'=>true, 'type'=>'judge']);
             return Redirect::route('admin.event.start', $candidate->event_id)->with(['status' => "Candidate is enabled."]);
         }
+    }
+
+    //get notify 
+    public function notifyJudge(){
+        $needtoShow = notifyUser::where('isShowed',1)->where('type','admin')->first();
+        $candidate = Candidate::where('id',$needtoShow->candidate_id)->first();
+        return response()->json(['data'=>$needtoShow, 'candidate'=>$candidate]);
     }
 
     

@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('notify_users', function (Blueprint $table) {
             $table->id();
+            $table->string('type')->nullable();
             $table->string('name')->nullable();
             $table->text('profile')->nullable();
             $table->boolean('isShowed')->nullable(0);
+            $table->unsignedBigInteger('candidate_id')->nullable();
             $table->timestamps();
         });
     }

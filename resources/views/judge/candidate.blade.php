@@ -40,8 +40,8 @@
                                     <div id="progress-bar" class="flex flex-col justify-center overflow-hidden bg-blue-600 text-xs text-white text-center whitespace-nowrap transition duration-500 dark:bg-blue-500" style="width: 100%"></div>
                                 </div> --}}
                                  <!-- Progress -->
-                                <div class="flex w-full h-4 bg-gray-200 overflow-hidden dark:bg-neutral-700" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="60">
-                                    <div id="timer-label" data-candidate_id="{{ $candidate->id }}" class="timer-label flex flex-col justify-center overflow-hidden bg-green-500 font-bold text-xs text-white text-center whitespace-nowrap dark:bg-blue-500 transition duration-500" style="width: 100%">{{ $candidate->counter }}s</div>
+                                <div class="flex w-full h-5 font-bold bg-gray-200 overflow-hidden dark:bg-neutral-700" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="60">
+                                    <div id="timer-label" data-candidate_id="{{ $candidate->id }}" class="timer-label flex flex-col justify-center overflow-hidden {{ $candidate->isActive ? 'bg-green-500' : 'bg-red-500' }} font-bold text-xs text-white text-center whitespace-nowrap dark:bg-blue-500 transition duration-500" style="width: 100%">{{ $candidate->counter }}s</div>
                                 </div>
                                 <!-- End Progress -->
                             </div>
@@ -69,6 +69,12 @@
                                 @foreach ($candidatesWithVotesInCategory as $voted)
                                 {{-- {{ $voted->votes }} --}}
                                     @if ($voted->id == $candidate->id)
+                                    <a href="{{ route('judge.modify', [auth()->user()->id, $candidate->id]) }}" 
+                                        data-name="{{ $candidate->name }}" 
+                                        class="absolute w-fit h-fit tracking-wide top-1 right-1 transform bg-red-500 px-1 py-1 rounded-md text-white font-bold text-sm opacity-100 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
+                                         <i class="fa-solid fa-hand"></i>
+                                     </a>
+                                     
                                         <a data-vote_id="{{ $voted->votes[0]->id }}" data-name="{{ $candidate->name }}" href="#" class="editVote {{ $candidate->isActive ? 'visible' : 'hidden' }} absolute w-fit h-fit tracking-wide top-1 right-1 transform bg-green-500 px-1 py-1 rounded-md text-white font-bold text-sm opacity-100 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </a>
@@ -119,9 +125,25 @@
             let availablecategory = @json($eventCategory);
             let cs = @json($activeEvent->candidates);
             let statusVote = @json(session('message'));
+            let requested = @json(session('requested'));
 
             $(document).ready(function(){
             
+                if(requested == 'success'){
+                    Swal.fire({
+                                icon: 'success',
+                                title: `Your request is submitted`,
+                                text: "Wait for the administrator to modified!.",
+                                
+                            })
+                }else if(requested == 'error'){
+                    Swal.fire({
+                                icon: 'error',
+                                title: `Request Failed`,
+                                text: "Youre already sent a request!.",
+                                
+                            })
+                }
                 //check if there is activated candidate for notification
                 const notifyInterval = setInterval(function(){
                     sendRequest("GET", "{{ route('judge.notify') }}")
@@ -187,7 +209,7 @@
                     // console.log(activeCandidates[0].id, )
                     if($(`.timer-label[data-candidate_id="${activeCandidates[0].id}"]`)){
                         if(timerValue <= 10){
-                            $(`.timer-label[data-candidate_id="${activeCandidates[0].id}"]`).removeClass('bg-green-500').addClass('bg-red-500')
+                            $(`.timer-label[data-candidate_id="${activeCandidates[0].id}"]`).removeClass('bg-green-500').addClass('bg-yellow-400')
                         }
                         $(`.timer-label[data-candidate_id="${activeCandidates[0].id}"]`).text(`${timerValue}s`).css('width', `${progressWidth}%`);
                     }

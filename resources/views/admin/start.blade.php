@@ -253,6 +253,49 @@
                 });
                 // console.log(leadingCandidatesPerCat)
                 $(document).ready(function(){
+
+                    //check if there is activated candidate for notification
+                const notifyInterval = setInterval(function(){
+                    sendRequest("GET", "{{ route('admin.notify') }}")
+                    .then(function(res){
+                        console.log(res.data)
+                        let path = "{{ asset('storage') }}"
+                        if(res.data !== null){
+                            clearInterval(notifyInterval); // Stop the timer when it reaches 0
+                            Swal.fire({
+                                title: `${res.data.name}`,
+                                text: `Requesting to edit Candidate: ${res.candidate.name}`,
+                                imageUrl: `${path}/${res.data.profile}`,
+                                imageWidth: 100,
+                                imageHeight: 100,
+                                imageAlt: "Custom image",
+                                allowOutsideClick: false // Disable outside click to close the alert
+                            }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        let data = {'id': res.data.id}
+                                        sendRequest("get", "{{ route('judge.notify.update') }}", data)
+                                        .then(function(res){
+                                            console.log(res)
+                                            if(res.status === 'success'){
+                                                window.location.reload();
+                                            }
+                                        })
+                                        .catch(function(err){
+                                            console.log(err)
+                                        })
+                                        // window.location.reload();
+                                    }
+                                });;
+
+                        }
+                        
+                    })
+                    .catch(function(err){
+                        console.log(err)
+                    })
+                    // console.log(data)
+                }, 1000)
+
                     //debug
                     // $('#activateModalBtn').trigger('click')
                     $('#statusCloseBtn').click(function(){

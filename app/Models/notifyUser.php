@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class notifyUser extends Model
 {
     use HasFactory;
-    protected $fillable = ['name','profile','isShowed'];
+    protected $fillable = ['name','profile','isShowed','type','candidate_id'];
 }

@@ -75,7 +75,7 @@ Route::group(['middleware' => ['auth','verified']], function () {
 
         // activate candidates for voting
         Route::post('/activate-candidate',[Administrator::class, 'activateCandidate'])->name('activate.candidate');
-       
+        Route::get('/notify',[Administrator::class, 'notifyJudge'])->name('notify');
     });
 
     // judge
@@ -97,6 +97,7 @@ Route::group(['middleware' => ['auth','verified']], function () {
             //get notify\
             Route::get('/notify',[JudgeController::class, 'notifyJudge'])->name('notify');
             Route::get('/notify-update',[JudgeController::class, 'notifyJudgeUpdate'])->name('notify.update');
+            Route::get('/notify-modified/{id}/{candidate}',[JudgeController::class, 'notifyJudgeModefied'])->name('modify');
         });
     });
 });

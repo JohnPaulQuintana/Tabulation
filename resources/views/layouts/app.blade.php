@@ -39,14 +39,19 @@
     {{-- font awesome --}}
     <link rel="stylesheet" data-purpose="Layout StyleSheet" title="Web Awesome"
         href="/css/app-wa-462d1fe84b879d730fe2180b0e0354e0.css?vsn=d">
-    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/all.css">
+        <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/all.css">
     <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/sharp-thin.css">
     <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/sharp-solid.css">
     <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/sharp-regular.css">
     <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/sharp-light.css">
+    {{-- <link rel="stylesheet" href="{{ asset('fontawesome/all.css') }}">
+    <link rel="stylesheet" href="{{ asset('fontawesome/sharp-thin.css') }}">
+    <link rel="stylesheet" href="{{ asset('fontawesome/sharp-solid.css') }}">
+    <link rel="stylesheet" href="{{ asset('fontawesome/sharp-regular.css') }}">
+    <link rel="stylesheet" href="{{ asset('fontawesome/sharp-light.css') }}"> --}}
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4/animate.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.6/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('animate/animate.min.css') }}">
+    <link href="{{ asset('sweetalert/sweetalert2.min.css') }}" rel="stylesheet">
     {{-- <link rel="stylesheet" href="./node_modules/apexcharts/dist/apexcharts.css"> --}}
     @yield('links')
     
@@ -81,10 +86,10 @@ $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(valu
             <!-- ===== Main Content End ===== -->
         </div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="{{ asset('jquery/jquery.min.js') }}"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.6/dist/sweetalert2.all.min.js"></script>
+    <script src="{{ asset('jquery/moment.min.js') }}"></script>
+    <script src="{{ asset('jquery/sweetalert2.all.min.js') }}"></script>
     @yield('scripts')
     <script>
         $(document).ready(function() {

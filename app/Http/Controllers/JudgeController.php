@@ -305,7 +305,7 @@ class JudgeController extends Controller
         $candidate = Candidate::find($request->candidate_id);
         // dd($candidate);
         if($candidate){
-            $candidate->update(['isActive'=>false]);
+            $candidate->update(['isActive'=>false, 'requested'=>false]);
             return response()->json(['status'=>'success']);
         }
     }
@@ -313,31 +313,39 @@ class JudgeController extends Controller
     //get notify 
     public function notifyJudge(){
         $needtoShow = notifyUser::where('isShowed',1)->where('type','judge')->first();
+        // dd($needtoShow);
         return response()->json(['data'=>$needtoShow]);
     }
+
     //update notify
     public function notifyJudgeUpdate(Request $request){
         $needtoUpdate = notifyUser::find($request->id);
         if ($needtoUpdate) {
             $needtoUpdate->update(['isShowed'=>0]);
+            // dd($needtoUpdate);
+            
             return response()->json(['status'=>'success']);
         }
         // dd($needtoUpdate);
         // return response()->json(['data'=>$needtoShow]);
     }
+
     //request for edit
     public function notifyJudgeModefied($userId, $candidateId, Request $request){
         
         $judge = Judge::find($userId);
         $candidate = Candidate::find($candidateId);
-        $existedRequest = notifyUser::where('candidate_id',$candidateId)->where('isShowed', true)->first();
+        $existedRequest = notifyUser::where('candidate_id',$candidateId)->where('isShowed', true)->where('requested',auth()->user()->id)->first();
         // dd($existedRequest);
         if($existedRequest){
             return Redirect::route('judge.candidates')->with(['requested'=>'error']);
         }
          //set notify
-         notifyUser::create(['name'=>$judge->name, 'profile'=>$judge->profile, 'isShowed'=>true, 'type'=>'admin', 'candidate_id'=>$candidate->id]);
-
+         notifyUser::create(['name'=>$judge->name, 'profile'=>$judge->profile, 'isShowed'=>true, 'type'=>'admin', 'candidate_id'=>$candidate->id, 'requested'=>auth()->user()->id]);
+        //update the requested in candidates
+        if($candidate){
+            $candidate->update(['requested'=>$userId]);
+        }
          return Redirect::route('judge.candidates')->with(['requested'=>'success']);
     }
 }

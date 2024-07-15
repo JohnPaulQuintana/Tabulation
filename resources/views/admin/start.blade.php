@@ -317,15 +317,16 @@
                         let path = "{{ asset('storage') }}"
                         candidates.forEach(c => {
                             r += `
-                                <div class="shadow p-2 bg-white flex gap-2">
+                                <div class="shadow p-2 bg-white ${c.isActive ? 'border border-green-500' : ''} flex gap-2">
                                 <img class="w-[60px] h-[60px]" src="${path}/${c.profile}" alt="" srcset="">
                                 <div class="w-full">
                                     <h1 class="font-bold">${c.name}</h1>
                                     <form action="{{ route('admin.activate.candidate') }}" method="POST" class="grid grid-cols-2 gap-1 w-[150px]">
                                         @csrf
+                                        <input type="number" name="requested_id" value="${c.requested}" class="p-1 rounded-sm hidden">
                                         <input type="number" name="candidate_id" value="${c.id}" class="p-1 rounded-sm hidden">
                                         <input type="number" name="counter" min="10" value="${c.counter}" class="p-1 rounded-sm">
-                                        <button type="submit" class="bg-red-500 text-white rounded-sm hover:bg-red-700 p-[1px]">Enable</button>
+                                        <button type="submit" class="${c.isActive ? 'bg-green-500' : "bg-red-500  hover:bg-red-700"} text-white rounded-sm p-[1px]" ${c.isActive ? 'disabled' : ""}>${c.isActive ? 'Enabled' : 'Enable'}</button>
                                     </form>
                                 </div>
                             </div>
@@ -334,6 +335,11 @@
 
                         $('#renderDeactivated').html(r)
                         $('#activateModalBtn').trigger('click')
+                    })
+
+                    //exit Active
+                    $('.exitActivate').click(function(){
+                        window.location.reload();
                     })
 
 

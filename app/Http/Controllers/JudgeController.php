@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Event;
 use App\Models\Game;
 use App\Models\Judge;
+use App\Models\notifyUser;
 use App\Models\PercentageScore;
 use App\Models\PlayerScore;
 use App\Models\PlayerTotalScore;
@@ -296,5 +297,32 @@ class JudgeController extends Controller
             $updatePercentage->update(['total_score' => $percentage]);
         }
         return Redirect::route('judge.candidates')->with(['status' => true, 'message' => 'Successfully recorded your votes!']);
+    }
+
+    //active update
+    public function isActiveUpdate(Request $request){
+        // dd($request->candidate_id);
+        $candidate = Candidate::find($request->candidate_id);
+        // dd($candidate);
+        if($candidate){
+            $candidate->update(['isActive'=>false]);
+            return response()->json(['status'=>'success']);
+        }
+    }
+
+    //get notify 
+    public function notifyJudge(){
+        $needtoShow = notifyUser::where('isShowed',1)->first();
+        return response()->json(['data'=>$needtoShow]);
+    }
+    //update notify
+    public function notifyJudgeUpdate(Request $request){
+        $needtoUpdate = notifyUser::find($request->id);
+        if ($needtoUpdate) {
+            $needtoUpdate->update(['isShowed'=>0]);
+            return response()->json(['status'=>'success']);
+        }
+        // dd($needtoUpdate);
+        // return response()->json(['data'=>$needtoShow]);
     }
 }

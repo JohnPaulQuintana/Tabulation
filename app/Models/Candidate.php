@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Candidate extends Model
 {
     use HasFactory;
-    protected $fillable = ['event_id','profile','name','age'];
+    protected $fillable = ['event_id','profile','name','age', 'counter', 'isActive'];
 
     public function event() :BelongsTo{
         return $this->belongsTo(Event::class);

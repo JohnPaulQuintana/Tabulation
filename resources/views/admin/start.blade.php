@@ -66,12 +66,14 @@
                                         </div>
                                     </div>
     
-                                    <div class="shadow p-2 flex items-center mb-2">
+                                    <div class="shadow p-2 flex flex-wrap items-center mb-2">
                                         <i class="fa-solid fa-users-viewfinder text-5xl mr-2"></i>
                                         <div class="text-center">
                                             <span class="block font-semibold">{{ __('Candidates') }}</span>
                                             <span>Total: <span class="font-bold">{{ count($activeEvents->candidates) }}</span></span>
                                         </div>
+
+                                        <a href="#" id="show" class="border-b-2 text-blue-500 hover:text-blue-700">show</a>
                                     </div>
     
                                     <div class="shadow p-2 flex items-center mb-2">
@@ -234,9 +236,11 @@
 
         @include('admin.category.edit')
         @include('admin.print.print')
+        @include('admin.popup.activate')
         @section('scripts')
             <script>
                 let dataToPrint = @json($dataToPrint);
+                // console.log(dataToPrint)
                 let leadingCandidatesPerCat = @json($leadingCandidatesForCategory);
 
                 // console.log(leadingCandidatesPerCat)
@@ -250,7 +254,7 @@
                 // console.log(leadingCandidatesPerCat)
                 $(document).ready(function(){
                     //debug
-                    // $('#printModalGame').trigger('click')
+                    // $('#activateModalBtn').trigger('click')
                     $('#statusCloseBtn').click(function(){
                         // alert('yes')
                         $('#statusBackdrop').addClass('hidden')
@@ -259,6 +263,34 @@
                     $('#updatedCloseBtn').click(function(){
                         $('#updatedBackdrop').addClass('hidden')
                         $('#updatedModal').addClass('hidden')
+                    })
+
+                    //show all candidates
+                    $('#show').click(function(){
+                        // alert('yes')
+                        candidates = leadingCandidatesPerCat.sort((a,b)=>{return a.id - b.id});
+                        console.log(candidates)
+                        let r = ''
+                        let path = "{{ asset('storage') }}"
+                        candidates.forEach(c => {
+                            r += `
+                                <div class="shadow p-2 bg-white flex gap-2">
+                                <img class="w-[60px] h-[60px]" src="${path}/${c.profile}" alt="" srcset="">
+                                <div class="w-full">
+                                    <h1 class="font-bold">${c.name}</h1>
+                                    <form action="{{ route('admin.activate.candidate') }}" method="POST" class="grid grid-cols-2 gap-1 w-[150px]">
+                                        @csrf
+                                        <input type="number" name="candidate_id" value="${c.id}" class="p-1 rounded-sm hidden">
+                                        <input type="number" name="counter" min="10" value="${c.counter}" class="p-1 rounded-sm">
+                                        <button type="submit" class="bg-red-500 text-white rounded-sm hover:bg-red-700 p-[1px]">Enable</button>
+                                    </form>
+                                </div>
+                            </div>
+                            ` 
+                        });
+
+                        $('#renderDeactivated').html(r)
+                        $('#activateModalBtn').trigger('click')
                     })
 
 

@@ -24,21 +24,43 @@
                 </div>
                 <div class="p-1">
                     <p><span class="text-red-500">Note: </span>All the Candidate's are required to have a vote. just click their profile to start voting...</p>
+                <!-- Progress -->
+                
+                <!-- End Progress -->
                 </div>
                 <div class="bg-white rounded-md p-2 shadow-2 mt-4 flex flex-wrap gap-4">
                     {{-- {{ $activeEvent->candidates }} --}}
                     @foreach ($activeEvent->candidates as $key => $candidate)
                     
                         <div class="shadow group hover:cursor-pointer">
+
+                            <div>
+                                {{-- <div id="timer-label" class="inline-block mb-2 ms-[calc(100%-1.25rem)] py-0.5 px-1.5 bg-blue-50 border border-blue-200 text-xs font-medium text-blue-600 rounded-lg dark:bg-blue-800/30 dark:border-blue-800 dark:text-blue-500">60s</div>
+                                <div class="flex w-full h-2 bg-gray-200 overflow-hidden dark:bg-neutral-700" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="60">
+                                    <div id="progress-bar" class="flex flex-col justify-center overflow-hidden bg-blue-600 text-xs text-white text-center whitespace-nowrap transition duration-500 dark:bg-blue-500" style="width: 100%"></div>
+                                </div> --}}
+                                 <!-- Progress -->
+                                <div class="flex w-full h-4 bg-gray-200 overflow-hidden dark:bg-neutral-700" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="60">
+                                    <div id="timer-label" data-candidate_id="{{ $candidate->id }}" class="timer-label flex flex-col justify-center overflow-hidden bg-green-500 font-bold text-xs text-white text-center whitespace-nowrap dark:bg-blue-500 transition duration-500" style="width: 100%">{{ $candidate->counter }}s</div>
+                                </div>
+                                <!-- End Progress -->
+                            </div>
+
                             <div class="relative overflow-hidden">
+                                
                                 <img class="w-30 h-30 transform transition-transform duration-300 ease-in-out group-hover:scale-110" 
                                     src="{{ asset('storage').'/'.$candidate->profile }}" alt="">
                                 <span class="absolute top-1 left-1 bg-red-500 p-1 rounded-xl text-white font-bold text-sm">
-                                    
-                                    @if ($key < 10)
+                                    {{-- original --}}
+                                    {{-- @if ($key < 10)
                                         0{{ $key+1 }}
                                     @else
                                         {{ $key }}
+                                    @endif --}}
+                                    @if ($candidate->id < 10)
+                                        0{{ $candidate->id }}
+                                    @else
+                                        {{ $candidate->id }} 
                                     @endif
                                 </span>
                                 @php
@@ -47,7 +69,7 @@
                                 @foreach ($candidatesWithVotesInCategory as $voted)
                                 {{-- {{ $voted->votes }} --}}
                                     @if ($voted->id == $candidate->id)
-                                        <a data-vote_id="{{ $voted->votes[0]->id }}" data-name="{{ $candidate->name }}" href="#" class="editVote absolute w-fit h-fit tracking-wide top-1 right-1 transform bg-green-500 px-1 py-1 rounded-md text-white font-bold text-sm opacity-100 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
+                                        <a data-vote_id="{{ $voted->votes[0]->id }}" data-name="{{ $candidate->name }}" href="#" class="editVote {{ $candidate->isActive ? 'visible' : 'hidden' }} absolute w-fit h-fit tracking-wide top-1 right-1 transform bg-green-500 px-1 py-1 rounded-md text-white font-bold text-sm opacity-100 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </a>
                                         <a data-candidate_id="{{ $candidate->id }}" data-name="{{ $candidate->name }}" href="#" class="absolute w-fit h-fit tracking-wide top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-500 px-4 py-2 rounded-xl text-white font-bold text-sm opacity-60 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
@@ -60,10 +82,15 @@
                                     @endif
                                 @endforeach
                             
-                                @if (!in_array($candidate->id, $alreadyVoted))
+                                @if (!in_array($candidate->id, $alreadyVoted) && $candidate->isActive)
                                     <a data-candidate_id="{{ $candidate->id }}" data-name="{{ $candidate->name }}" href="#" class="absolute voteNow w-fit h-fit tracking-wide top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-500 px-4 py-2 rounded-xl text-white font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
                                         Vote
-                                    </a>  
+                                    </a>
+                                    
+                                @elseif (!in_array($candidate->id, $alreadyVoted))
+                                    <a data-candidate_id="{{ $candidate->id }}" data-name="{{ $candidate->name }}" href="#" class="absolute voteNow w-fit h-fit tracking-wide top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-100 px-2 py-1 rounded-xl text-red-500 font-bold text-sm opacity-100 transition-opacity duration-300 ease-in-out">
+                                        Waiting...
+                                    </a>
                                 @endif
                             
                                 
@@ -90,9 +117,110 @@
     
         <script>
             let availablecategory = @json($eventCategory);
+            let cs = @json($activeEvent->candidates);
             let statusVote = @json(session('message'));
+
             $(document).ready(function(){
-                
+            
+                //check if there is activated candidate for notification
+                const notifyInterval = setInterval(function(){
+                    sendRequest("GET", "{{ route('judge.notify') }}")
+                    .then(function(res){
+                        console.log(res.data)
+                        let path = "{{ asset('storage') }}"
+                        if(res.data !== null){
+                            clearInterval(notifyInterval); // Stop the timer when it reaches 0
+                            Swal.fire({
+                                title: `${res.data.name}`,
+                                text: "This candidate is now ready to votes.",
+                                imageUrl: `${path}/${res.data.profile}`,
+                                imageWidth: 100,
+                                imageHeight: 100,
+                                imageAlt: "Custom image",
+                                allowOutsideClick: false // Disable outside click to close the alert
+                            }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        let data = {'id': res.data.id}
+                                        sendRequest("get", "{{ route('judge.notify.update') }}", data)
+                                        .then(function(res){
+                                            console.log(res)
+                                            if(res.status === 'success'){
+                                                window.location.reload();
+                                            }
+                                        })
+                                        .catch(function(err){
+                                            console.log(err)
+                                        })
+                                        // window.location.reload();
+                                    }
+                                });;
+
+                        }
+                        
+                    })
+                    .catch(function(err){
+                        console.log(err)
+                    })
+                    // console.log(data)
+                }, 1000)
+
+            // Filter the candidates with isActive = 1
+            let activeCandidates = cs.filter(candidate => candidate.isActive === 1);
+            // Initial timer value in seconds  
+            let timerValue = activeCandidates.length > 0 ? activeCandidates[0].counter : 0;
+            //for debug only
+            // let timerV alue = 0;
+            // Log the filtered active candidates to the console
+            let progressWidth = 100;
+             // Update timer and progress bar every second
+             const timerInterval = setInterval(function() {
+                if (timerValue > 0) {
+                    timerValue--;
+                    // Calculate progress bar width as percentage
+                    
+                    // if(timerValue >= 60){
+                        // progressWidth = (timerValue / 60) * 100
+                    // }
+                    // console.log(progressWidth)
+                    // Update timer label
+                    
+                    // console.log(activeCandidates[0].id, )
+                    if($(`.timer-label[data-candidate_id="${activeCandidates[0].id}"]`)){
+                        if(timerValue <= 10){
+                            $(`.timer-label[data-candidate_id="${activeCandidates[0].id}"]`).removeClass('bg-green-500').addClass('bg-red-500')
+                        }
+                        $(`.timer-label[data-candidate_id="${activeCandidates[0].id}"]`).text(`${timerValue}s`).css('width', `${progressWidth}%`);
+                    }
+                    
+                    if(timerValue === 0){
+                        let data = {candidate_id:activeCandidates[0].id}
+                        sendRequest('GET', '{{ route('judge.active.update') }}', data)
+                        .then(function(res){
+                            console.log(res.status)
+                            if(res.status === 'success'){
+                                Swal.fire({
+                                    title: "Times up!",
+                                    text: "You can now click the edit button to notify admin, to enabled edit!",
+                                    icon: "info",
+                                    confirmButtonColor: "#3085d6",
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                       window.location.reload();
+                                    }
+                                });
+                            }
+                            
+                        })
+                        .catch(function(err){
+                            console.log(err)
+                        })
+                        
+                    }
+                    
+                } else {
+                    clearInterval(timerInterval); // Stop the timer when it reaches 0
+                }
+            }, 1000); // 1000 milliseconds = 1 second
                 
                 // console.log(availablecategory.judge_count)
 

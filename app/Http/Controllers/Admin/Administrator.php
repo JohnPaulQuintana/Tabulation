@@ -9,6 +9,7 @@ use App\Models\Event;
 use App\Models\Game;
 use App\Models\GameResult;
 use App\Models\Judge;
+use App\Models\notifyUser;
 use App\Models\PercentageScore;
 use App\Models\Player;
 use App\Models\PlayerTotalScore;
@@ -945,6 +946,22 @@ class Administrator extends Controller
         }
         return Redirect::route('admin.sports.game', $request->event_id)->with(['validation'=>false,'modal'=>false, 'status'=>true]);
     }
+
+    //activate candidate
+    public function activateCandidate(Request $request){
+        // dd($request);
+        $candidate = Candidate::find($request->candidate_id);
+        // dd($candidate);
+        if ($candidate) {
+            $candidate->update(['isActive'=>true, 'counter'=>$request->counter]);
+
+            //set notify
+            notifyUser::create(['name'=>$candidate->name, 'profile'=>$candidate->profile, 'isShowed'=>true]);
+            return Redirect::route('admin.event.start', $candidate->event_id)->with(['status' => "Candidate is enabled."]);
+        }
+    }
+
+    
 
     private function generateUniqueCode()
     {

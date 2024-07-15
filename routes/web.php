@@ -72,6 +72,10 @@ Route::group(['middleware' => ['auth','verified']], function () {
         Route::post('/sports/change', [Administrator::class, 'teamChange'])->name('sports.change.selected');
         Route::post('/sports/judge', [Administrator::class, 'assignedJudge'])->name('sports.judge.selected');
         Route::post('/sports/game/end', [Administrator::class, 'endGame'])->name('sports.game.end');
+
+        // activate candidates for voting
+        Route::post('/activate-candidate',[Administrator::class, 'activateCandidate'])->name('activate.candidate');
+       
     });
 
     // judge
@@ -87,6 +91,12 @@ Route::group(['middleware' => ['auth','verified']], function () {
             Route::get('/sports',[JudgeController::class, 'sports'])->name('sports');
             Route::post('/sports/player/score',[JudgeController::class, 'sportsPlayerScore'])->name('sports.player.score');
             Route::post('/sports/player/score/update',[JudgeController::class, 'sportsPlayerScoreUpdate'])->name('sports.player.score.update');
+
+            Route::get('/activate-candidate-update',[JudgeController::class, 'isActiveUpdate'])->name('active.update');
+
+            //get notify\
+            Route::get('/notify',[JudgeController::class, 'notifyJudge'])->name('notify');
+            Route::get('/notify-update',[JudgeController::class, 'notifyJudgeUpdate'])->name('notify.update');
         });
     });
 });

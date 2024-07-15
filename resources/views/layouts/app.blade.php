@@ -61,6 +61,13 @@
             background: red;
         }
     </style> --}}
+    <style>
+        .icons {
+            width: 1em;
+            height: 1em;
+            vertical-align: -0.125em;
+        }
+    </style>
 </head>
 
 <body x-data="{ page: 'ecommerce', 'loaded': true, 'darkMode': true, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }" x-init="darkMode = JSON.parse(localStorage.getItem('darkMode'));

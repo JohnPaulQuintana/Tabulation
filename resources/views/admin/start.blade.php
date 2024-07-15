@@ -67,7 +67,10 @@
                                     </div>
     
                                     <div class="shadow p-2 flex flex-wrap items-center mb-2">
-                                        <i class="fa-solid fa-users-viewfinder text-5xl mr-2"></i>
+                                        {{-- <i class="fa-solid fa-users-viewfinder text-5xl mr-2"></i> --}}
+                                        <div>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-[50px] h-50px mr-2" fill="#64748b" viewBox="0 0 640 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M96 0C43 0 0 43 0 96V416c0 53 43 96 96 96H544c53 0 96-43 96-96V96c0-53-43-96-96-96H96zM64 96c0-17.7 14.3-32 32-32H544c17.7 0 32 14.3 32 32V416c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V96zm159.8 80a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM96 309.3c0 14.7 11.9 26.7 26.7 26.7h56.1c8-34.1 32.8-61.7 65.2-73.6c-7.5-4.1-16.2-6.4-25.3-6.4H149.3C119.9 256 96 279.9 96 309.3zM461.2 336h56.1c14.7 0 26.7-11.9 26.7-26.7c0-29.5-23.9-53.3-53.3-53.3H421.3c-9.2 0-17.8 2.3-25.3 6.4c32.4 11.9 57.2 39.5 65.2 73.6zM372 289c-3.9-.7-7.9-1-12-1H280c-4.1 0-8.1 .3-12 1c-26 4.4-47.3 22.7-55.9 47c-2.7 7.5-4.1 15.6-4.1 24c0 13.3 10.7 24 24 24H408c13.3 0 24-10.7 24-24c0-8.4-1.4-16.5-4.1-24c-8.6-24.3-29.9-42.6-55.9-47zM512 176a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM320 256a64 64 0 1 0 0-128 64 64 0 1 0 0 128z"/></svg>
+                                        </div>
                                         <div class="text-center">
                                             <span class="block font-semibold">{{ __('Candidates') }}</span>
                                             <span>Total: <span class="font-bold">{{ count($activeEvents->candidates) }}</span></span>
@@ -77,7 +80,10 @@
                                     </div>
     
                                     <div class="shadow p-2 flex items-center mb-2">
-                                        <i class="fa-solid fa-users-between-lines text-5xl mr-2"></i>
+                                        {{-- <i class="fa-solid fa-users-between-lines text-5xl mr-2"></i> --}}
+                                        <div>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-[50px] h-50px mr-2" fill="#64748b" viewBox="0 0 640 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M0 24C0 10.7 10.7 0 24 0H616c13.3 0 24 10.7 24 24s-10.7 24-24 24H24C10.7 48 0 37.3 0 24zM0 488c0-13.3 10.7-24 24-24H616c13.3 0 24 10.7 24 24s-10.7 24-24 24H24c-13.3 0-24-10.7-24-24zM83.2 160a64 64 0 1 1 128 0 64 64 0 1 1 -128 0zM32 320c0-35.3 28.7-64 64-64h96c12.2 0 23.7 3.4 33.4 9.4c-37.2 15.1-65.6 47.2-75.8 86.6H64c-17.7 0-32-14.3-32-32zm461.6 32c-10.3-40.1-39.6-72.6-77.7-87.4c9.4-5.5 20.4-8.6 32.1-8.6h96c35.3 0 64 28.7 64 64c0 17.7-14.3 32-32 32H493.6zM391.2 290.4c32.1 7.4 58.1 30.9 68.9 61.6c3.5 10 5.5 20.8 5.5 32c0 17.7-14.3 32-32 32h-224c-17.7 0-32-14.3-32-32c0-11.2 1.9-22 5.5-32c10.5-29.7 35.3-52.8 66.1-60.9c7.8-2.1 16-3.1 24.5-3.1h96c7.4 0 14.7 .8 21.6 2.4zm44-130.4a64 64 0 1 1 128 0 64 64 0 1 1 -128 0zM321.6 96a80 80 0 1 1 0 160 80 80 0 1 1 0-160z"/></svg>
+                                        </div>
                                         <div class="text-center">
                                             <span class="block font-semibold">{{ __('Judge') }}</span>
                                             <span>Total: <span class="font-bold">{{ count($activeEvents->judge) }}</span></span>
@@ -130,7 +136,8 @@
                                                     <tr class="bg-white border-b border-slate-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-slate-100 dark:hover:bg-gray-600">
                                                         <td class="w-4 p-4">
                                                             <div class="flex items-center">
-                                                                <i class="fa-solid fa-square-check text-2xl text-green-500"></i>
+                                                                {{-- <i class="fa-solid fa-square-check text-2xl text-green-500"></i> --}}
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-[20px] h-[20px]" fill="#0e9f6e" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zM337 209L209 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L303 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/></svg>
                                                             </div>
                                                         </td>
                                                         <td scope="row"
@@ -175,21 +182,29 @@
                                 @foreach ($activeEvents->category as $category)
                                     <div class="flex-shrink-0 w-64 shadow p-4 items-center">
                                         <h1 class="font-semibold mb-2 flex justify-between items-center">
-                                            <div>
+                                            <div class="flex gap-1 items-center">
                                                 @if ($category->status)
-                                                <i class="fa-solid fa-circle text-xs text-green-500"></i>
+                                                {{-- <i class="fa-solid fa-circle text-xs text-green-500"></i> --}}
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-[10px] h-[10px]" fill="#0e9f6e" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"/></svg>
                                                 @else
-                                                <i class="fa-solid fa-circle text-xs text-red-500"></i>
+                                                {{-- <i class="fa-solid fa-circle text-xs text-red-500"></i> --}}
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-[10px] h-[10px]" fill="#f05252" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"/></svg>
                                                 @endif
                                                 <span>{{ $category->category_name }}</span>
                                             </div>
 
-                                            <div>
+                                            <div class="flex gap-1 items-center">
                                                 @if ($category->status)
-                                                <a data-category="{{ $category->id }}" href="#" class="printResult text-blue-500 px-1 rounded-md hover:text-blue-700"><i class="fa-solid fa-print"></i></a>
+                                                <a data-category="{{ $category->id }}" href="#" class="printResult text-blue-500 px-1 rounded-md hover:text-blue-700">
+                                                    {{-- <i class="fa-solid fa-print"></i> --}}
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-[15px] h-[15px]" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zM432 248a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg>
+                                                </a>
                                                 @endif
                                                 
-                                                <a data-category="{{ $category->id }}" href="#" class="editCategory text-blue-500 px-1 rounded-md hover:text-blue-700"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                <a data-category="{{ $category->id }}" href="#" class="editCategory text-blue-500 px-1 rounded-md hover:text-blue-700">
+                                                    {{-- <i class="fa-solid fa-pen-to-square"></i> --}}
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-[15px] h-[15px]" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z"/></svg>
+                                                </a>
                                             </div>
                                         </h1>
                                         @foreach ($category->subCategory as $sub)

@@ -76,7 +76,7 @@
                                     @if ($voted->id == $candidate->id)
                                         <a href="{{ route('judge.modify', [auth()->user()->id, $candidate->id]) }}"
                                             data-name="{{ $candidate->name }}"
-                                            class="absolute w-fit h-fit tracking-wide top-1 right-1 transform bg-red-500 px-1 py-1 rounded-md text-white font-bold text-sm opacity-100 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
+                                            class="absolute hands w-fit h-fit tracking-wide top-1 right-1 transform bg-red-500 px-1 py-1 rounded-md text-white font-bold text-sm opacity-100 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
                                             {{-- <i class="fa-solid fa-hand"></i> --}}
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icons" viewBox="0 0 512 512"><path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V240c0 8.8-7.2 16-16 16s-16-7.2-16-16V64c0-17.7-14.3-32-32-32s-32 14.3-32 32V336c0 1.5 0 3.1 .1 4.6L67.6 283c-16-15.2-41.3-14.6-56.6 1.4s-14.6 41.3 1.4 56.6L124.8 448c43.1 41.1 100.4 64 160 64H304c97.2 0 176-78.8 176-176V128c0-17.7-14.3-32-32-32s-32 14.3-32 32V240c0 8.8-7.2 16-16 16s-16-7.2-16-16V64c0-17.7-14.3-32-32-32s-32 14.3-32 32V240c0 8.8-7.2 16-16 16s-16-7.2-16-16V32z"/></svg>
                                         </a>
@@ -237,15 +237,28 @@
             let currentUserId = {{ auth()->user()->id }};
             let timerValue = 0;
             let activeCandidates = cs.filter(candidate => candidate.isActive === 1);
-           
-            if(activeCandidates.length > 0){
+            // Check if 'timerValue' exists in localStorage, if not set it to 0
+            let counter = localStorage.getItem('timerValue') ? parseInt(localStorage.getItem('timerValue'), 10) : 0;
+
+            if(activeCandidates.length > 0){ 
                 activeCandidates2 = activeCandidates.filter(can => can.requested === currentUserId);
-                console.log(activeCandidates)
+                // console.log(activeCandidates)
                 if(activeCandidates2 > 0){
-                    // Initial timer value in seconds  
-                    timerValue = activeCandidates2[0].counter;
+                    // Initial timer value in seconds 
+                  
+                    if(counter > 0){
+                        timerValue = counter
+                    }else{
+                        timerValue = activeCandidates2[0].counter;
+                    }
+                    
                 }else{
-                    timerValue = activeCandidates[0].counter;
+                    // timerValue = activeCandidates[0].counter;
+                    if(counter > 0){
+                        timerValue = counter
+                    }else{
+                        timerValue = activeCandidates[0].counter;
+                    }
                 }
                     
             }
@@ -256,8 +269,14 @@
             let progressWidth = 100;
             // Update timer and progress bar every second
             const timerInterval = setInterval(function() {
+                
                 if (timerValue > 0) {
+                    //remove the hand signed
+                    $('.hands').addClass('hidden')
                     timerValue--;
+                    // Store the timerValue in localStorage
+                    localStorage.setItem('timerValue', timerValue);
+
                     // Calculate progress bar width as percentage
 
                     // if(timerValue >= 60){
